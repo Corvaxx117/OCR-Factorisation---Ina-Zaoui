@@ -20,6 +20,9 @@ return RectorConfig::configure()
         SymfonySetList::SYMFONY_64,
         SymfonySetList::SYMFONY_70,
         SymfonySetList::SYMFONY_71,
+        SymfonySetList::SYMFONY_72,
+        SymfonySetList::SYMFONY_73,
+        SymfonySetList::SYMFONY_74,
         SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
         DoctrineSetList::ANNOTATIONS_TO_ATTRIBUTES,
     ]);

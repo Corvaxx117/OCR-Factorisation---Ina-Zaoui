@@ -20,16 +20,12 @@ class MediaType extends AbstractType
         $builder
             ->add('file', FileType::class, [
                 'constraints' => [
-                    new File([
-                        'maxSize' => '5M',
-                        'mimeTypes' => [
-                            'image/jpeg',
-                            'image/png',
-                            'image/gif',
-                            'image/webp',
-                        ],
-                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG, PNG, GIF, WebP).',
-                    ])
+                    new File(maxSize: '5M', mimeTypes: [
+                        'image/jpeg',
+                        'image/png',
+                        'image/gif',
+                        'image/webp',
+                    ], mimeTypesMessage: 'Veuillez uploader une image valide (JPEG, PNG, GIF, WebP).')
                 ]
             ])
             ->add('title', TextType::class, [
