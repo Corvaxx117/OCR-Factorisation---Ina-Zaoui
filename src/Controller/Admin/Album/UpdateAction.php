@@ -2,7 +2,6 @@
 
 namespace App\Controller\Admin\Album;
 
-use App\Entity\Album;
 use App\Form\AlbumType;
 use App\Repository\AlbumRepository;
 use Doctrine\ORM\EntityManagerInterface;
