@@ -1,4 +1,7 @@
 /.idea
+.DS_Store
+/backup/
+*.pdf
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
@@ -18,3 +21,7 @@
 .phpunit.result.cache
 /phpunit.xml
 ###< symfony/phpunit-bridge ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###
