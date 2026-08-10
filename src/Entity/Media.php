@@ -34,7 +34,7 @@ class Media
     private string $title;
 
     #[Assert\File(
-        maxSize: '5M',
+        maxSize: '2M',
         mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
         mimeTypesMessage: 'Veuillez uploader une image valide (JPEG, PNG, GIF, WebP).'
     )]

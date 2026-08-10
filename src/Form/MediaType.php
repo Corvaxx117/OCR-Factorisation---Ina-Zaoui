@@ -24,7 +24,7 @@ class MediaType extends AbstractType
         $builder
             ->add('file', FileType::class, [
                 'constraints' => [
-                    new File(maxSize: '5M', mimeTypes: [
+                    new File(maxSize: '2M', mimeTypes: [
                         'image/jpeg',
                         'image/png',
                         'image/gif',
