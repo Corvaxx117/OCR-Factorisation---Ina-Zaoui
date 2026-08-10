@@ -13,7 +13,7 @@ class GuestAction extends AbstractController
     {
         $guest = $userRepository->find($id);
 
-        if (!$guest) {
+        if (!$guest || !$guest->isActive()) {
             throw $this->createNotFoundException('Invité introuvable.');
         }
 
