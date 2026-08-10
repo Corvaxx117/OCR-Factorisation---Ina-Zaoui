@@ -14,8 +14,8 @@ class GuestsAction extends AbstractController
     #[Route(path: '/guests', name: 'guests')]
     public function __invoke(UserRepository $userRepository)
     {
-        $guests = $userRepository->findBy(['admin' => false, 'active' => true]);
-
+        $guests = $userRepository->findActiveGuestsWithMedias();
+        
         return $this->render('front/guests.html.twig', [
             'guests' => $guests
         ]);
