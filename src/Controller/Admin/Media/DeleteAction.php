@@ -29,7 +29,10 @@ class DeleteAction extends AbstractController
 
         $em->remove($media);
         $em->flush();
-        unlink($media->getPath());
+
+        if (file_exists($media->getPath())) {
+            unlink($media->getPath());
+        }
 
         return $this->redirectToRoute('admin_media_index');
     }

@@ -1,0 +1,53 @@
+{% extends 'admin.html.twig' %}
+
+{% block admin %}
+    <div class="d-flex justify-content-between align-items-center">
+        <h1>Invités</h1>
+        <a href="{{ path('admin_guest_add') }}" class="btn btn-primary">Ajouter</a>
+    </div>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Statut</th>
+            <th>Médias</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for guest in guests %}
+            <tr>
+                <td>{{ guest.name }}</td>
+                <td>{{ guest.email }}</td>
+                <td>
+                    {% if guest.active %}
+                        <span class="badge bg-success">Actif</span>
+                    {% else %}
+                        <span class="badge bg-secondary">Bloqué</span>
+                    {% endif %}
+                </td>
+                <td>{{ guest.medias|length }}</td>
+                <td>
+                    <form method="post" action="{{ path('admin_guest_block', {id: guest.id}) }}" style="display:inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('block-guest-' ~ guest.id) }}">
+                        <button type="submit" class="btn btn-sm btn-{{ guest.active ? 'warning' : 'success' }}">
+                            {{ guest.active ? 'Bloquer' : 'Débloquer' }}
+                        </button>
+                    </form>
+                    <form method="post" action="{{ path('admin_guest_delete', {id: guest.id}) }}" 
+                          style="display:inline" 
+                          onsubmit="return confirm('Supprimer cet invité et tous ses médias ?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete-guest-' ~ guest.id) }}">
+                        <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-muted">Aucun invité pour le moment.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

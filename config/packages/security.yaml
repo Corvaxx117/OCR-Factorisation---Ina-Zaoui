@@ -13,9 +13,11 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
             form_login:
                 login_path: admin_login
                 check_path: admin_login
+                default_target_path: /admin/media
             logout:
                 path: admin_logout
     role_hierarchy:

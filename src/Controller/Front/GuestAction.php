@@ -13,6 +13,10 @@ class GuestAction extends AbstractController
     {
         $guest = $userRepository->find($id);
 
+        if (!$guest) {
+            throw $this->createNotFoundException('Invité introuvable.');
+        }
+
         return $this->render('front/guest.html.twig', [
             'guest' => $guest
         ]);
