@@ -31,6 +31,8 @@ class AddAction extends AbstractController
             $em->persist($media);
             $em->flush();
 
+            $this->addFlash('success', 'Média ajouté avec succès.');
+
             return $this->redirectToRoute('admin_media_index');
         }
 

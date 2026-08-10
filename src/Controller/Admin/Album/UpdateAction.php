@@ -24,6 +24,8 @@ class UpdateAction extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->flush();
 
+            $this->addFlash('success', 'Album modifié avec succès.');
+
             return $this->redirectToRoute('admin_album_index');
         }
 

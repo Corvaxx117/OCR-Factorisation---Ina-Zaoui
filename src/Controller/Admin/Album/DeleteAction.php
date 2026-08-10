@@ -25,6 +25,8 @@ class DeleteAction extends AbstractController
         $em->remove($album);
         $em->flush();
 
+        $this->addFlash('success', 'Album supprimé avec succès.');
+
         return $this->redirectToRoute('admin_album_index');
     }
 }

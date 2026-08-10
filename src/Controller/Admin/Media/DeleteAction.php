@@ -38,6 +38,8 @@ class DeleteAction extends AbstractController
             unlink($media->getPath());
         }
 
+        $this->addFlash('success', 'Média supprimé avec succès.');
+
         return $this->redirectToRoute('admin_media_index');
     }
 }

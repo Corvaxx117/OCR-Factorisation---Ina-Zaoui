@@ -30,7 +30,7 @@ class IndexAction extends AbstractController
             25,
             25 * ($page - 1)
         );
-        $total = $mediaRepository->count([]);
+        $total = $mediaRepository->count($criteria);
 
         return $this->render('admin/media/index.html.twig', [
             'medias' => $medias,

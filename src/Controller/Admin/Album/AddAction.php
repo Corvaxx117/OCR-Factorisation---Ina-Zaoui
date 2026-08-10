@@ -25,6 +25,8 @@ class AddAction extends AbstractController
             $em->persist($album);
             $em->flush();
 
+            $this->addFlash('success', 'Album ajouté avec succès.');
+
             return $this->redirectToRoute('admin_album_index');
         }
 
