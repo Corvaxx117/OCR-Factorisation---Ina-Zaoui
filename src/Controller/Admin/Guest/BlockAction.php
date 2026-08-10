@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Toggle le statut actif/inactif d'un invité (POST + CSRF).
+ * Un invité bloqué ne peut plus se connecter ni apparaître sur le site.
+ */
 #[IsGranted('ROLE_ADMIN')]
 class BlockAction extends AbstractController
 {

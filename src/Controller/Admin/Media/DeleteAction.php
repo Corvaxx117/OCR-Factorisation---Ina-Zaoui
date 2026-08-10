@@ -8,6 +8,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Suppression d'un média (POST + CSRF).
+ * Vérifie les droits : admin ou propriétaire uniquement.
+ */
 class DeleteAction extends AbstractController
 {
     #[Route(path: '/admin/media/delete/{id}', name: 'admin_media_delete', methods: ['POST'])]

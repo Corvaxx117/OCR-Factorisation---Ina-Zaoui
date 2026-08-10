@@ -9,6 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Formulaire de modification d'un album existant.
+ */
 class UpdateAction extends AbstractController
 {
     #[Route(path: '/admin/album/update/{id}', name: 'admin_album_update')]

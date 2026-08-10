@@ -8,6 +8,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Suppression d'un album (POST + CSRF).
+ * Les médias associés sont supprimés en cascade.
+ */
 class DeleteAction extends AbstractController
 {
     #[Route(path: '/admin/album/delete/{id}', name: 'admin_album_delete', methods: ['POST'])]

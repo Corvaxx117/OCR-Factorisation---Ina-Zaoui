@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Suppression d'un invité et de tous ses médias (fichiers + BDD).
+ * Protégé par CSRF, réservé à l'admin.
+ */
 #[IsGranted('ROLE_ADMIN')]
 class DeleteAction extends AbstractController
 {

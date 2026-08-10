@@ -5,6 +5,9 @@ namespace App\Controller\Admin\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Route de déconnexion, interceptée par le firewall Symfony.
+ */
 class LogoutAction extends AbstractController
 {
     #[Route(path: '/logout', name: 'admin_logout')]

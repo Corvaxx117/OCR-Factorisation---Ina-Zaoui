@@ -8,6 +8,10 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Affiche le portfolio d'Ina, filtrable par album.
+ * Sans filtre, affiche les médias de l'admin.
+ */
 class PortfolioAction extends AbstractController
 {
     #[Route(path: '/portfolio/{id?}', name: 'portfolio')]

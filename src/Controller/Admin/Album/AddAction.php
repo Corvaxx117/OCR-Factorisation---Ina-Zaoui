@@ -9,6 +9,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Formulaire de création d'un nouvel album.
+ */
 class AddAction extends AbstractController
 {
     #[Route(path: '/admin/album/add', name: 'admin_album_add')]

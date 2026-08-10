@@ -10,6 +10,10 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * Formulaire d'ajout d'un invité par l'administrateur.
+ * Champs : nom, email, mot de passe (non mappé, hashé dans le controller).
+ */
 class GuestType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

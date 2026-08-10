@@ -7,6 +7,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Liste les médias avec pagination (25/page).
+ * Les non-admins ne voient que leurs propres médias.
+ */
 class IndexAction extends AbstractController
 {
     #[Route(path: '/admin/media', name: 'admin_media_index')]

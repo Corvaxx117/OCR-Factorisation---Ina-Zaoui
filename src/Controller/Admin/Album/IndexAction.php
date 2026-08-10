@@ -6,6 +6,9 @@ use App\Repository\AlbumRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Liste tous les albums (admin).
+ */
 class IndexAction extends AbstractController
 {
     #[Route(path: '/admin/album', name: 'admin_album_index')]

@@ -8,6 +8,10 @@ use Symfony\Component\Security\Core\Exception\CustomUserMessageAccountStatusExce
 use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * Vérifie l'état du compte utilisateur avant authentification.
+ * Bloque la connexion si le compte est désactivé (active = false).
+ */
 class UserChecker implements UserCheckerInterface
 {
     public function checkPreAuth(UserInterface $user): void

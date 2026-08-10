@@ -6,6 +6,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
+/**
+ * Affiche et gère le formulaire de connexion.
+ */
 class LoginAction extends AbstractController
 {
     #[Route(path: '/login', name: 'admin_login')]

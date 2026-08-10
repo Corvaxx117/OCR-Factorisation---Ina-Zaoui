@@ -9,6 +9,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Upload d'un nouveau média avec validation du fichier.
+ * Génère un nom de fichier aléatoire sécurisé.
+ */
 class AddAction extends AbstractController
 {
     #[Route(path: '/admin/media/add', name: 'admin_media_add')]

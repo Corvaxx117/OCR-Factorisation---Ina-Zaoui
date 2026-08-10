@@ -8,6 +8,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Liste tous les invités (admin uniquement).
+ */
 #[IsGranted('ROLE_ADMIN')]
 class IndexAction extends AbstractController
 {

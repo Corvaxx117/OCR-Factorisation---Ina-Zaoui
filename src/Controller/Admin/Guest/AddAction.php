@@ -12,6 +12,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Ajout d'un invité : crée un User avec admin=false, hash le mot de passe.
+ */
 #[IsGranted('ROLE_ADMIN')]
 class AddAction extends AbstractController
 {
