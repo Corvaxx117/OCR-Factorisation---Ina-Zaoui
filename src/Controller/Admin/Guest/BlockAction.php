@@ -22,7 +22,11 @@ class BlockAction extends AbstractController
     use AdminActionTrait;
 
     #[Route(path: '/admin/guest/block/{id}', name: 'admin_guest_block', methods: ['POST'])]
-    public function __invoke(Request $request, #[MapEntity(id: 'id')] User $guest, EntityManagerInterface $em): Response
+    public function __invoke(
+        Request $request,
+        #[MapEntity(id: 'id')] User $guest,
+        EntityManagerInterface $em
+    ): Response
     {
         $this->denyAccessUnlessValidCsrfToken('block-guest-'.$guest->getId(), $request);
 
