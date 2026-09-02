@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Album;
 use App\Entity\Media;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -19,5 +20,21 @@ class MediaRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Media::class);
+    }
+
+    /**
+     * Médias du portfolio public : ceux de l'album donné, ou ceux de l'admin par défaut.
+     */
+    public function findPortfolioMedias(?Album $album): array
+    {
+        if ($album) {
+            return $this->findBy(['album' => $album]);
+        }
+
+        return $this->createQueryBuilder('m')
+            ->join('m.user', 'u')
+            ->where('u.admin = true')
+            ->getQuery()
+            ->getResult();
     }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Controller\Admin\Media;
 
+use App\Entity\User;
 use App\Repository\MediaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 /**
  * Liste les médias avec pagination (25/page).
@@ -14,14 +16,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class IndexAction extends AbstractController
 {
     #[Route(path: '/admin/media', name: 'admin_media_index')]
-    public function __invoke(Request $request, MediaRepository $mediaRepository)
+    public function __invoke(Request $request, MediaRepository $mediaRepository, #[CurrentUser] User $currentUser)
     {
         $page = $request->query->getInt('page', 1);
 
         $criteria = [];
 
         if (!$this->isGranted('ROLE_ADMIN')) {
-            $criteria['user'] = $this->getUser();
+            $criteria['user'] = $currentUser;
         }
 
         $medias = $mediaRepository->findBy(

@@ -2,9 +2,10 @@
 
 namespace App\Controller\Admin\Album;
 
+use App\Entity\Album;
 use App\Form\AlbumType;
-use App\Repository\AlbumRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -17,9 +18,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class UpdateAction extends AbstractController
 {
     #[Route(path: '/admin/album/update/{id}', name: 'admin_album_update')]
-    public function __invoke(Request $request, int $id, AlbumRepository $albumRepository, EntityManagerInterface $em)
+    public function __invoke(Request $request, #[MapEntity(id: 'id')] Album $album, EntityManagerInterface $em)
     {
-        $album = $albumRepository->find($id);
         $form = $this->createForm(AlbumType::class, $album);
         $form->handleRequest($request);
 

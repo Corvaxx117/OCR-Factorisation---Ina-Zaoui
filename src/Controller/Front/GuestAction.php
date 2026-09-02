@@ -2,7 +2,8 @@
 
 namespace App\Controller\Front;
 
-use App\Repository\UserRepository;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -13,11 +14,9 @@ use Symfony\Component\Routing\Attribute\Route;
 class GuestAction extends AbstractController
 {
     #[Route(path: '/guest/{id}', name: 'guest')]
-    public function __invoke(int $id, UserRepository $userRepository)
+    public function __invoke(#[MapEntity(id: 'id')] User $guest)
     {
-        $guest = $userRepository->find($id);
-
-        if (!$guest || !$guest->isActive()) {
+        if (!$guest->isActive()) {
             throw $this->createNotFoundException('Invité introuvable.');
         }
 

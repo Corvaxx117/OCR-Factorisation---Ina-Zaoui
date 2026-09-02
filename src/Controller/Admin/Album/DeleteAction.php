@@ -2,8 +2,10 @@
 
 namespace App\Controller\Admin\Album;
 
-use App\Repository\AlbumRepository;
+use App\Controller\Admin\AdminActionTrait;
+use App\Entity\Album;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,19 +18,20 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class DeleteAction extends AbstractController
 {
-    #[Route(path: '/admin/album/delete/{id}', name: 'admin_album_delete', methods: ['POST'])]
-    public function __invoke(Request $request, int $id, AlbumRepository $albumRepository, EntityManagerInterface $em)
-    {
-        if (!$this->isCsrfTokenValid('delete-album-' . $id, $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide.');
-        }
+    use AdminActionTrait;
 
-        $album = $albumRepository->find($id);
+    #[Route(path: '/admin/album/delete/{id}', name: 'admin_album_delete', methods: ['POST'])]
+    public function __invoke(
+        Request $request,
+        #[MapEntity(id: 'id')] Album $album,
+        EntityManagerInterface $em
+    )
+    {
+        $this->denyAccessUnlessValidCsrfToken('delete-album-'.$album->getId(), $request);
+
         $em->remove($album);
         $em->flush();
 
-        $this->addFlash('success', 'Album supprimé avec succès.');
-
-        return $this->redirectToRoute('admin_album_index');
+        return $this->redirectWithSuccess('Album supprimé avec succès.', 'admin_album_index');
     }
 }

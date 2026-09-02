@@ -6,6 +6,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * WebTestCase simule un vrai navigateur (client HTTP interne) sans réseau ni serveur réel :
@@ -14,7 +15,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class LoginTest extends WebTestCase
 {
-    private \Symfony\Bundle\FrameworkBundle\KernelBrowser $client;
+    private KernelBrowser $client;
     private EntityManagerInterface $em;
     private UserPasswordHasherInterface $hasher;
 

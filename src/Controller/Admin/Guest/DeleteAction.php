@@ -2,8 +2,11 @@
 
 namespace App\Controller\Admin\Guest;
 
-use App\Repository\UserRepository;
+use App\Controller\Admin\AdminActionTrait;
+use App\Entity\User;
+use App\Service\FileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,33 +20,21 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class DeleteAction extends AbstractController
 {
+    use AdminActionTrait;
+
     #[Route(path: '/admin/guest/delete/{id}', name: 'admin_guest_delete', methods: ['POST'])]
-    public function __invoke(Request $request, int $id, UserRepository $userRepository, EntityManagerInterface $em): Response
+    public function __invoke(Request $request, #[MapEntity(id: 'id')] User $guest, EntityManagerInterface $em, FileUploadService $fileUploadService): Response
     {
-        if (!$this->isCsrfTokenValid('delete-guest-' . $id, $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide.');
-        }
+        $this->denyAccessUnlessValidCsrfToken('delete-guest-'.$guest->getId(), $request);
 
-        $guest = $userRepository->find($id);
-
-        if (!$guest) {
-            throw $this->createNotFoundException('Invité introuvable.');
-        }
-
-        // Suppression des fichiers physiques des médias
         foreach ($guest->getMedias() as $media) {
-            $filePath = $media->getPath();
-            if (file_exists($filePath)) {
-                unlink($filePath);
-            }
+            $fileUploadService->remove($media->getPath());
             $em->remove($media);
         }
 
         $em->remove($guest);
         $em->flush();
 
-        $this->addFlash('success', 'Invité supprimé avec succès.');
-
-        return $this->redirectToRoute('admin_guest_index');
+        return $this->redirectWithSuccess('Invité supprimé avec succès.', 'admin_guest_index');
     }
 }

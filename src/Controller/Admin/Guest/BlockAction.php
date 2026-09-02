@@ -2,8 +2,10 @@
 
 namespace App\Controller\Admin\Guest;
 
-use App\Repository\UserRepository;
+use App\Controller\Admin\AdminActionTrait;
+use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,24 +19,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class BlockAction extends AbstractController
 {
+    use AdminActionTrait;
+
     #[Route(path: '/admin/guest/block/{id}', name: 'admin_guest_block', methods: ['POST'])]
-    public function __invoke(Request $request, int $id, UserRepository $userRepository, EntityManagerInterface $em): Response
+    public function __invoke(Request $request, #[MapEntity(id: 'id')] User $guest, EntityManagerInterface $em): Response
     {
-        if (!$this->isCsrfTokenValid('block-guest-' . $id, $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide.');
-        }
-
-        $guest = $userRepository->find($id);
-
-        if (!$guest) {
-            throw $this->createNotFoundException('Invité introuvable.');
-        }
+        $this->denyAccessUnlessValidCsrfToken('block-guest-'.$guest->getId(), $request);
 
         $guest->setActive(!$guest->isActive());
         $em->flush();
 
-        $this->addFlash('success', $guest->isActive() ? 'Invité débloqué.' : 'Invité bloqué.');
-
-        return $this->redirectToRoute('admin_guest_index');
+        return $this->redirectWithSuccess($guest->isActive() ? 'Invité débloqué.' : 'Invité bloqué.', 'admin_guest_index');
     }
 }

@@ -2,11 +2,16 @@
 
 namespace App\Controller\Admin\Media;
 
-use App\Repository\MediaRepository;
+use App\Controller\Admin\AdminActionTrait;
+use App\Entity\Media;
+use App\Entity\User;
+use App\Service\FileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 /**
  * Suppression d'un média (POST + CSRF).
@@ -14,32 +19,21 @@ use Symfony\Component\Routing\Attribute\Route;
  */
 class DeleteAction extends AbstractController
 {
+    use AdminActionTrait;
+
     #[Route(path: '/admin/media/delete/{id}', name: 'admin_media_delete', methods: ['POST'])]
-    public function __invoke(Request $request, int $id, MediaRepository $mediaRepository, EntityManagerInterface $em)
+    public function __invoke(Request $request, #[MapEntity(id: 'id')] Media $media, EntityManagerInterface $em, FileUploadService $fileUploadService, #[CurrentUser] User $currentUser)
     {
-        if (!$this->isCsrfTokenValid('delete-media-' . $id, $request->request->get('_token'))) {
-            throw $this->createAccessDeniedException('Token CSRF invalide.');
-        }
+        $this->denyAccessUnlessValidCsrfToken('delete-media-'.$media->getId(), $request);
 
-        $media = $mediaRepository->find($id);
-
-        if (!$media) {
-            throw $this->createNotFoundException('Média introuvable.');
-        }
-
-        if (!$this->isGranted('ROLE_ADMIN') && $media->getUser() !== $this->getUser()) {
+        if (!$this->isGranted('ROLE_ADMIN') && $media->getUser() !== $currentUser) {
             throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres médias.');
         }
 
         $em->remove($media);
         $em->flush();
+        $fileUploadService->remove($media->getPath());
 
-        if (file_exists($media->getPath())) {
-            unlink($media->getPath());
-        }
-
-        $this->addFlash('success', 'Média supprimé avec succès.');
-
-        return $this->redirectToRoute('admin_media_index');
+        return $this->redirectWithSuccess('Média supprimé avec succès.', 'admin_media_index');
     }
 }
