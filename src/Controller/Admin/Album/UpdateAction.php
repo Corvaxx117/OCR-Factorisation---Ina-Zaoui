@@ -8,10 +8,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Formulaire de modification d'un album existant.
+ * Formulaire de modification d'un album existant (admin uniquement).
  */
+#[IsGranted('ROLE_ADMIN')]
 class UpdateAction extends AbstractController
 {
     #[Route(path: '/admin/album/update/{id}', name: 'admin_album_update')]

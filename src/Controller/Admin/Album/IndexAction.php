@@ -5,10 +5,12 @@ namespace App\Controller\Admin\Album;
 use App\Repository\AlbumRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Liste tous les albums (admin).
+ * Liste tous les albums (admin uniquement).
  */
+#[IsGranted('ROLE_ADMIN')]
 class IndexAction extends AbstractController
 {
     #[Route(path: '/admin/album', name: 'admin_album_index')]

@@ -7,11 +7,13 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Suppression d'un album (POST + CSRF).
+ * Suppression d'un album (POST + CSRF, admin uniquement).
  * Les médias associés sont supprimés en cascade.
  */
+#[IsGranted('ROLE_ADMIN')]
 class DeleteAction extends AbstractController
 {
     #[Route(path: '/admin/album/delete/{id}', name: 'admin_album_delete', methods: ['POST'])]
