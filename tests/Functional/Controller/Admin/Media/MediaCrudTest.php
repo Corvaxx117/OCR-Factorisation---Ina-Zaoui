@@ -2,6 +2,7 @@
 
 namespace App\Tests\Functional\Controller\Admin\Media;
 
+use App\DataFixtures\AppFixtures;
 use App\Entity\Media;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
@@ -196,15 +197,8 @@ class MediaCrudTest extends WebTestCase
 
     private function loginAs(bool $admin): User
     {
-        $email = $admin ? 'admin@test.local' : 'guest@test.local';
-        $user = new User();
-        $user->setEmail($email);
-        $user->setName($email);
-        $user->setActive(true);
-        $user->setAdmin($admin);
-        $user->setPassword($this->hasher->hashPassword($user, 'password'));
-        $this->em->persist($user);
-        $this->em->flush();
+        $email = $admin ? AppFixtures::ADMIN_EMAIL : AppFixtures::ACTIVE_GUEST_EMAIL;
+        $user = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
 
         $crawler = $this->client->request('GET', '/login');
         $form = $crawler->filter('form')->form([

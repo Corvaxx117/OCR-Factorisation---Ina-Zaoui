@@ -2,12 +2,12 @@
 
 namespace App\Tests\Functional\Controller\Admin\Album;
 
+use App\DataFixtures\AppFixtures;
 use App\Entity\Album;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * Couvre les 4 actions Album : Index, Add, Update, Delete.
@@ -106,7 +106,7 @@ class AlbumCrudTest extends WebTestCase
 
         // Le token doit provenir du vrai générateur CSRF de Symfony, pas être inventé.
         $crawler = $this->client->request('GET', '/admin/album');
-        $token = $crawler->filter('input[name="_token"]')->attr('value');
+        $token = $crawler->filter('form[action$="/admin/album/delete/'.$albumId.'"] input[name="_token"]')->attr('value');
 
         $this->client->request('POST', '/admin/album/delete/'.$albumId, ['_token' => $token]);
 
@@ -139,17 +139,7 @@ class AlbumCrudTest extends WebTestCase
 
     private function loginAs(bool $admin): void
     {
-        $hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
-
-        $user = new User();
-        $email = $admin ? 'admin@test.local' : 'guest@test.local';
-        $user->setEmail($email);
-        $user->setName($email);
-        $user->setActive(true);
-        $user->setAdmin($admin);
-        $user->setPassword($hasher->hashPassword($user, 'password'));
-        $this->em->persist($user);
-        $this->em->flush();
+        $email = $admin ? AppFixtures::ADMIN_EMAIL : AppFixtures::ACTIVE_GUEST_EMAIL;
 
         $crawler = $this->client->request('GET', '/login');
         $form = $crawler->filter('form')->form([

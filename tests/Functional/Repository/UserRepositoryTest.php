@@ -32,7 +32,7 @@ class UserRepositoryTest extends KernelTestCase
     {
         $activeGuest = $this->createUser('active-guest@test.local', admin: false, active: true);
         $this->createUser('blocked-guest@test.local', admin: false, active: false);
-        $this->createUser('admin@test.local', admin: true, active: true);
+        $this->createUser('repository-admin@test.local', admin: true, active: true);
 
         $media = new Media();
         $media->setTitle('Photo de test');
@@ -47,7 +47,7 @@ class UserRepositoryTest extends KernelTestCase
 
         $this->assertContains('active-guest@test.local', $emails);
         $this->assertNotContains('blocked-guest@test.local', $emails, 'Un invité bloqué ne doit jamais apparaître ici.');
-        $this->assertNotContains('admin@test.local', $emails, 'Un admin n\'est pas un invité.');
+        $this->assertNotContains('repository-admin@test.local', $emails, 'Un admin n\'est pas un invité.');
     }
 
     public function testFindActiveGuestsWithMediasPreloadsMediaCollection(): void
