@@ -74,6 +74,24 @@ class MediaCrudTest extends WebTestCase
         $this->assertSelectorTextContains('body', 'Photo visible par admin');
     }
 
+    public function testIndexPaginatesMedias(): void
+    {
+        $admin = $this->loginAs(admin: true);
+
+        for ($index = 1; $index <= 24; ++$index) {
+            $this->createMediaFor($admin, sprintf('pagination-media-%02d', $index));
+        }
+
+        $this->client->request('GET', '/admin/media');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextNotContains('body', 'pagination-media-24');
+        $this->assertSelectorExists('.pagination');
+
+        $this->client->request('GET', '/admin/media?page=2');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('body', 'pagination-media-24');
+    }
+
     public function testAddMediaUploadsValidFileAndAssignsCurrentUser(): void
     {
         $guest = $this->loginAs(admin: false);

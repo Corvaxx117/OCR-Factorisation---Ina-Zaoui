@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Pagination\PaginatedResult;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -47,5 +48,20 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
             ->andWhere('u.active = true')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return PaginatedResult<User>
+     */
+    public function paginateGuests(int $page, int $perPage): PaginatedResult
+    {
+        $criteria = ['admin' => false];
+
+        return new PaginatedResult(
+            $this->findBy($criteria, ['id' => 'ASC'], $perPage, $perPage * ($page - 1)),
+            $page,
+            $perPage,
+            $this->count($criteria),
+        );
     }
 }

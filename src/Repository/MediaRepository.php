@@ -4,6 +4,8 @@ namespace App\Repository;
 
 use App\Entity\Album;
 use App\Entity\Media;
+use App\Entity\User;
+use App\Pagination\PaginatedResult;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -33,5 +35,20 @@ class MediaRepository extends ServiceEntityRepository
             ->where('u.admin = true')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return PaginatedResult<Media>
+     */
+    public function paginateForUser(?User $user, int $page, int $perPage): PaginatedResult
+    {
+        $criteria = null === $user ? [] : ['user' => $user];
+
+        return new PaginatedResult(
+            $this->findBy($criteria, ['id' => 'ASC'], $perPage, $perPage * ($page - 1)),
+            $page,
+            $perPage,
+            $this->count($criteria),
+        );
     }
 }

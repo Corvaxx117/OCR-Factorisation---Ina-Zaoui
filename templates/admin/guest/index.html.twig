@@ -50,4 +50,5 @@
         {% endfor %}
         </tbody>
     </table>
+    {% include 'admin/_pagination.html.twig' with {pagination: pagination, route: 'admin_guest_index'} %}
 {% endblock %}

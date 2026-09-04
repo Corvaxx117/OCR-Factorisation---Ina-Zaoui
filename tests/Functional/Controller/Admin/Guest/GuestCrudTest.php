@@ -55,6 +55,24 @@ class GuestCrudTest extends WebTestCase
         $this->assertSelectorTextNotContains('body', 'admin@test.local');
     }
 
+    public function testIndexPaginatesGuests(): void
+    {
+        $this->loginAs(admin: true);
+
+        for ($index = 1; $index <= 24; ++$index) {
+            $this->createGuest(sprintf('pagination-%02d@test.local', $index));
+        }
+
+        $this->client->request('GET', '/admin/guest');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextNotContains('body', 'pagination-24@test.local');
+        $this->assertSelectorExists('.pagination');
+
+        $this->client->request('GET', '/admin/guest?page=2');
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('body', 'pagination-24@test.local');
+    }
+
     public function testAddGuestHashesPasswordAndSetsDefaultFlags(): void
     {
         $this->loginAs(admin: true);
