@@ -16,7 +16,7 @@ class GuestAction extends AbstractController
     #[Route(path: '/guest/{id}', name: 'guest')]
     public function __invoke(#[MapEntity(id: 'id')] User $guest)
     {
-        if (!$guest->isActive()) {
+        if ($guest->isAdmin() || !$guest->isActive()) {
             throw $this->createNotFoundException('Invité introuvable.');
         }
 

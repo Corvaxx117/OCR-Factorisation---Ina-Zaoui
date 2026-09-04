@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class PortfolioAction extends AbstractController
 {
     #[Route(path: '/portfolio/{id?}', name: 'portfolio')]
-    public function __invoke(?int $id = null, AlbumRepository $albumRepository, MediaRepository $mediaRepository)
+    public function __invoke(AlbumRepository $albumRepository, MediaRepository $mediaRepository, ?int $id = null)
     {
         $albums = $albumRepository->findAll();
         $album = $id ? $albumRepository->find($id) : null;
