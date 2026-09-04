@@ -4,6 +4,7 @@ namespace App\Tests\Functional\Controller\Admin\Album;
 
 use App\DataFixtures\AppFixtures;
 use App\Entity\Album;
+use App\Tests\Support\DoctrineTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -14,13 +15,15 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class AlbumCrudTest extends WebTestCase
 {
+    use DoctrineTestTrait;
+
     private KernelBrowser $client;
     private EntityManagerInterface $em;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->em = self::getContainer()->get(EntityManagerInterface::class);
+        $this->em = $this->entityManager();
     }
 
     public function testIndexRequiresAdminRole(): void

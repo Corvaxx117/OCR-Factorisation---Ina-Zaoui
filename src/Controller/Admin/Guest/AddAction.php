@@ -29,6 +29,10 @@ class AddAction extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $plainPassword = $form->get('password')->getData();
+            if (!is_string($plainPassword)) {
+                throw new \LogicException('Le mot de passe est invalide.');
+            }
+
             $guestRegistrationService->register($guest, $plainPassword);
 
             return $this->redirectWithSuccess('Invité ajouté avec succès.', 'admin_guest_index');

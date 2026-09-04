@@ -5,6 +5,7 @@ namespace App\Tests\Functional\Repository;
 use App\Entity\Media;
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Tests\Support\DoctrineTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
@@ -17,6 +18,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
  */
 class UserRepositoryTest extends KernelTestCase
 {
+    use DoctrineTestTrait;
+
     private EntityManagerInterface $em;
     private UserRepository $userRepository;
 
@@ -24,7 +27,7 @@ class UserRepositoryTest extends KernelTestCase
     {
         self::bootKernel();
 
-        $this->em = self::getContainer()->get(EntityManagerInterface::class);
+        $this->em = $this->entityManager();
         $this->userRepository = $this->em->getRepository(User::class);
     }
 

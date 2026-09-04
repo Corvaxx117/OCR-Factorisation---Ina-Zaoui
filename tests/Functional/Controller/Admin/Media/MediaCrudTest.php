@@ -5,6 +5,8 @@ namespace App\Tests\Functional\Controller\Admin\Media;
 use App\DataFixtures\AppFixtures;
 use App\Entity\Media;
 use App\Entity\User;
+use App\Tests\Support\DoctrineTestTrait;
+use App\Tests\Support\PasswordHasherTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -17,6 +19,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class MediaCrudTest extends WebTestCase
 {
+    use DoctrineTestTrait;
+    use PasswordHasherTestTrait;
+
     private KernelBrowser $client;
     private EntityManagerInterface $em;
     private UserPasswordHasherInterface $hasher;
@@ -29,8 +34,8 @@ class MediaCrudTest extends WebTestCase
         $this->client = static::createClient();
         // Sans ça, chaque requête reboote le kernel et invalide $this->em, cassant le suivi des entités déjà persistées.
         $this->client->disableReboot();
-        $this->em = self::getContainer()->get(EntityManagerInterface::class);
-        $this->hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+        $this->em = $this->entityManager();
+        $this->hasher = $this->passwordHasher();
     }
 
     protected function tearDown(): void
@@ -87,7 +92,10 @@ class MediaCrudTest extends WebTestCase
         $this->em->clear();
         $media = $this->em->getRepository(Media::class)->findOneBy(['title' => 'Photo valide']);
         $this->assertNotNull($media);
-        $this->assertSame($guest->getId(), $media->getUser()->getId());
+        $this->assertInstanceOf(User::class, $guest);
+        $owner = $media->getUser();
+        $this->assertInstanceOf(User::class, $owner);
+        $this->assertSame($guest->getId(), $owner->getId());
         $this->uploadedFiles[] = $media->getPath();
         $this->assertFileExists($media->getPath());
     }
@@ -159,6 +167,7 @@ class MediaCrudTest extends WebTestCase
         // Une requête HTTP entretemps réinitialise l'EntityManager : on refetch $user par id pour être sûr
         // qu'il est bien "managé" par l'EntityManager courant avant de le rattacher à un nouveau Media.
         $user = $this->em->getRepository(User::class)->find($user->getId());
+        $this->assertInstanceOf(User::class, $user);
 
         $media = new Media();
         $media->setTitle($title);
@@ -204,6 +213,7 @@ class MediaCrudTest extends WebTestCase
     {
         $email = $admin ? AppFixtures::ADMIN_EMAIL : AppFixtures::ACTIVE_GUEST_EMAIL;
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);
+        $this->assertInstanceOf(User::class, $user);
 
         $crawler = $this->client->request('GET', '/login');
         $form = $crawler->filter('form')->form([

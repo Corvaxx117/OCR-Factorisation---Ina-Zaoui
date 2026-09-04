@@ -11,6 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Formulaire de création/modification d'un album.
  */
+/** @extends AbstractType<Album> */
 class AlbumType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

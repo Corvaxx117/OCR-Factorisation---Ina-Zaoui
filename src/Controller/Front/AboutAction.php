@@ -3,6 +3,7 @@
 namespace App\Controller\Front;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -11,7 +12,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class AboutAction extends AbstractController
 {
     #[Route(path: '/about', name: 'about')]
-    public function __invoke()
+    public function __invoke(): Response
     {
         return $this->render('front/about.html.twig');
     }

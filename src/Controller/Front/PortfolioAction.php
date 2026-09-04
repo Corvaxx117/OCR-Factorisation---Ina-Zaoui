@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Repository\AlbumRepository;
 use App\Repository\MediaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class PortfolioAction extends AbstractController
 {
     #[Route(path: '/portfolio/{id?}', name: 'portfolio')]
-    public function __invoke(AlbumRepository $albumRepository, MediaRepository $mediaRepository, ?int $id = null)
+    public function __invoke(AlbumRepository $albumRepository, MediaRepository $mediaRepository, ?int $id = null): Response
     {
         $albums = $albumRepository->findAll();
         $album = $id ? $albumRepository->find($id) : null;

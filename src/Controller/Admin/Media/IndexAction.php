@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\MediaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -16,7 +17,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 class IndexAction extends AbstractController
 {
     #[Route(path: '/admin/media', name: 'admin_media_index')]
-    public function __invoke(Request $request, MediaRepository $mediaRepository, #[CurrentUser] User $currentUser)
+    public function __invoke(Request $request, MediaRepository $mediaRepository, #[CurrentUser] User $currentUser): Response
     {
         $page = $request->query->getInt('page', 1);
 

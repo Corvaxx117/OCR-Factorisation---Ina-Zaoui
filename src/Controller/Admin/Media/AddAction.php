@@ -10,6 +10,7 @@ use App\Service\FileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
@@ -27,7 +28,7 @@ class AddAction extends AbstractController
         EntityManagerInterface $em,
         FileUploadService $fileUploadService,
         #[CurrentUser] User $currentUser,
-    ) {
+    ): Response {
         $media = new Media();
         $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
         $form->handleRequest($request);
@@ -36,7 +37,12 @@ class AddAction extends AbstractController
             if (!$this->isGranted('ROLE_ADMIN')) {
                 $media->setUser($currentUser);
             }
-            $media->setPath($fileUploadService->upload($media->getFile()));
+            $file = $media->getFile();
+            if (null === $file) {
+                throw new \LogicException('Un fichier valide est requis.');
+            }
+
+            $media->setPath($fileUploadService->upload($file));
             $em->persist($media);
             $em->flush();
 

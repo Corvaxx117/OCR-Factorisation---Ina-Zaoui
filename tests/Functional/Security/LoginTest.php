@@ -3,6 +3,8 @@
 namespace App\Tests\Functional\Security;
 
 use App\Entity\User;
+use App\Tests\Support\DoctrineTestTrait;
+use App\Tests\Support\PasswordHasherTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -15,6 +17,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class LoginTest extends WebTestCase
 {
+    use DoctrineTestTrait;
+    use PasswordHasherTestTrait;
+
     private KernelBrowser $client;
     private EntityManagerInterface $em;
     private UserPasswordHasherInterface $hasher;
@@ -24,8 +29,8 @@ class LoginTest extends WebTestCase
         // createClient() boot le kernel lui-même : ne jamais appeler bootKernel() en plus dans un WebTestCase.
         $this->client = static::createClient();
 
-        $this->em = self::getContainer()->get(EntityManagerInterface::class);
-        $this->hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+        $this->em = $this->entityManager();
+        $this->hasher = $this->passwordHasher();
     }
 
     public function testLoginPageIsAccessible(): void

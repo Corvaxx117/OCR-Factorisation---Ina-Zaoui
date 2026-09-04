@@ -3,6 +3,7 @@
 namespace App\Controller\Admin\Security;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -12,7 +13,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 class LoginAction extends AbstractController
 {
     #[Route(path: '/login', name: 'admin_login')]
-    public function __invoke(AuthenticationUtils $authenticationUtils)
+    public function __invoke(AuthenticationUtils $authenticationUtils): Response
     {
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();

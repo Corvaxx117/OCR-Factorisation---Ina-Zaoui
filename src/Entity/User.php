@@ -41,12 +41,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+    /** @var list<string> */
     #[ORM\Column(type: 'json')]
     private array $roles = [];
 
     #[ORM\Column]
     private bool $active = true;
 
+    /** @var Collection<int, Media> */
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'user')]
     private Collection $medias;
 
@@ -92,11 +94,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->description = $description;
     }
 
+    /** @return Collection<int, Media> */
     public function getMedias(): Collection
     {
         return $this->medias;
     }
 
+    /** @param Collection<int, Media> $medias */
     public function setMedias(Collection $medias): void
     {
         $this->medias = $medias;
@@ -134,6 +138,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->active = $active;
     }
 
+    /** @return list<string> */
     public function getRoles(): array
     {
         $roles = $this->roles;
@@ -143,9 +148,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $roles[] = 'ROLE_ADMIN';
         }
 
-        return array_unique($roles);
+        return array_values(array_unique($roles));
     }
 
+    /** @param list<string> $roles */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
@@ -155,7 +161,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        if (null === $this->email || '' === $this->email) {
+            throw new \LogicException('L\'email utilisateur est requis.');
+        }
+
+        return $this->email;
     }
 
     public function getUsername(): string

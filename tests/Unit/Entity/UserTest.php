@@ -32,6 +32,7 @@ class UserTest extends TestCase
         $this->assertFalse($this->user->isActive());
     }
 
+    /** @param list<string> $expectedRoles */
     #[DataProvider('adminFlagProvider')]
     public function testGetRolesDependsOnAdminFlag(bool $isAdmin, array $expectedRoles): void
     {
@@ -40,6 +41,7 @@ class UserTest extends TestCase
         $this->assertSame($expectedRoles, $this->user->getRoles());
     }
 
+    /** @return iterable<string, array{bool, list<string>}> */
     public static function adminFlagProvider(): iterable
     {
         yield 'guest has only ROLE_USER' => [false, ['ROLE_USER']];

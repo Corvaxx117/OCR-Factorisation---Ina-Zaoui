@@ -11,13 +11,6 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
 /**
  * @extends ServiceEntityRepository<User>
- *
- * @implements PasswordUpgraderInterface<User>
- *
- * @method User|null find($id, $lockMode = null, $lockVersion = null)
- * @method User|null findOneBy(array $criteria, array $orderBy = null)
- * @method User[]    findAll()
- * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
@@ -42,6 +35,8 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     /**
      * Récupère les invités actifs avec leurs médias en une seule requête (évite le N+1).
+     *
+     * @return list<User>
      */
     public function findActiveGuestsWithMedias(): array
     {

@@ -20,6 +20,7 @@ class MediaTest extends TestCase
 {
     private Media $media;
     private ValidatorInterface $validator;
+    /** @var list<string> */
     private array $tmpFiles = [];
 
     // Exécuté avant CHAQUE test de cette classe : $media repart neuve à chaque fois, aucun état partagé entre tests.
@@ -79,6 +80,7 @@ class MediaTest extends TestCase
         $this->assertGreaterThan(0, $violations->count(), 'Ce fichier aurait dû être rejeté par la contrainte Assert\File.');
     }
 
+    /** @return iterable<string, array{string, int, string}> */
     public static function invalidFileProvider(): iterable
     {
         // Contenu texte brut : aucun magic number image, détecté comme text/plain par finfo.
@@ -107,6 +109,10 @@ class MediaTest extends TestCase
     private function createFakeUploadedFile(string $content, int $totalSize, string $originalName): UploadedFile
     {
         $path = tempnam(sys_get_temp_dir(), 'media_test_');
+
+        if (false === $path) {
+            throw new \RuntimeException('Impossible de créer le fichier temporaire.');
+        }
         file_put_contents($path, $content.str_repeat("\0", max(0, $totalSize - strlen($content))));
         $this->tmpFiles[] = $path;
 

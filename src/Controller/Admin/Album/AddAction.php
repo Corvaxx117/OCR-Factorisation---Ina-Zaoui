@@ -8,6 +8,7 @@ use App\Form\AlbumType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -20,7 +21,7 @@ class AddAction extends AbstractController
     use AdminActionTrait;
 
     #[Route(path: '/admin/album/add', name: 'admin_album_add')]
-    public function __invoke(Request $request, EntityManagerInterface $em)
+    public function __invoke(Request $request, EntityManagerInterface $em): Response
     {
         $album = new Album();
         $form = $this->createForm(AlbumType::class, $album);

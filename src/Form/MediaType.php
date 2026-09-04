@@ -17,6 +17,7 @@ use Symfony\Component\Validator\Constraints\File;
  * Formulaire d'ajout d'un média.
  * Affiche les champs user/album uniquement pour les admins.
  */
+/** @extends AbstractType<Media> */
 class MediaType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

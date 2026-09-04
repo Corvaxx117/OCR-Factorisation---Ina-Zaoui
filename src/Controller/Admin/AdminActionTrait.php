@@ -14,7 +14,7 @@ trait AdminActionTrait
 {
     protected function denyAccessUnlessValidCsrfToken(string $tokenId, Request $request): void
     {
-        if (!$this->isCsrfTokenValid($tokenId, $request->request->get('_token'))) {
+        if (!$this->isCsrfTokenValid($tokenId, $request->request->getString('_token'))) {
             throw $this->createAccessDeniedException('Token invalide.');
         }
     }

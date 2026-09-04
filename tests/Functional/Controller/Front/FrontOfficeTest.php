@@ -7,6 +7,7 @@ namespace App\Tests\Functional\Controller\Front;
 use App\DataFixtures\AppFixtures;
 use App\Entity\Album;
 use App\Entity\User;
+use App\Tests\Support\DoctrineTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -17,13 +18,15 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 class FrontOfficeTest extends WebTestCase
 {
+    use DoctrineTestTrait;
+
     private KernelBrowser $client;
     private EntityManagerInterface $em;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->em = self::getContainer()->get(EntityManagerInterface::class);
+        $this->em = $this->entityManager();
     }
 
     #[DataProvider('publicPageProvider')]
@@ -35,6 +38,7 @@ class FrontOfficeTest extends WebTestCase
         $this->assertSelectorTextContains('body', $expectedContent);
     }
 
+    /** @return iterable<string, array{string, string}> */
     public static function publicPageProvider(): iterable
     {
         yield 'home page' => ['/', 'Photographe'];

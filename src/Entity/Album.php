@@ -25,6 +25,7 @@ class Album
     #[Assert\Length(max: 255, maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères.')]
     private string $name;
 
+    /** @var Collection<int, Media> */
     #[ORM\OneToMany(targetEntity: Media::class, mappedBy: 'album', cascade: ['remove'])]
     private Collection $medias;
 
@@ -48,6 +49,7 @@ class Album
         $this->name = $name;
     }
 
+    /** @return Collection<int, Media> */
     public function getMedias(): Collection
     {
         return $this->medias;

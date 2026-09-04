@@ -5,6 +5,8 @@ namespace App\Tests\Functional\Controller\Admin\Guest;
 use App\DataFixtures\AppFixtures;
 use App\Entity\Media;
 use App\Entity\User;
+use App\Tests\Support\DoctrineTestTrait;
+use App\Tests\Support\PasswordHasherTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -17,6 +19,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
  */
 class GuestCrudTest extends WebTestCase
 {
+    use DoctrineTestTrait;
+    use PasswordHasherTestTrait;
+
     private KernelBrowser $client;
     private EntityManagerInterface $em;
     private UserPasswordHasherInterface $hasher;
@@ -24,8 +29,8 @@ class GuestCrudTest extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
-        $this->em = self::getContainer()->get(EntityManagerInterface::class);
-        $this->hasher = self::getContainer()->get(UserPasswordHasherInterface::class);
+        $this->em = $this->entityManager();
+        $this->hasher = $this->passwordHasher();
     }
 
     public function testIndexRequiresAdminRole(): void
@@ -85,6 +90,7 @@ class GuestCrudTest extends WebTestCase
         $this->assertResponseRedirects('/admin/guest');
         $this->em->clear();
         $reloaded = $this->em->getRepository(User::class)->find($guest->getId());
+        $this->assertInstanceOf(User::class, $reloaded);
         $this->assertFalse($reloaded->isActive());
     }
 

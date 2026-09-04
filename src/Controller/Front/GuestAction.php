@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Entity\User;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 /**
@@ -14,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class GuestAction extends AbstractController
 {
     #[Route(path: '/guest/{id}', name: 'guest')]
-    public function __invoke(#[MapEntity(id: 'id')] User $guest)
+    public function __invoke(#[MapEntity(id: 'id')] User $guest): Response
     {
         if ($guest->isAdmin() || !$guest->isActive()) {
             throw $this->createNotFoundException('Invité introuvable.');
