@@ -22,7 +22,7 @@ class Media
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'medias', fetch: 'EAGER')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Album::class, fetch: 'EAGER')]
+    #[ORM\ManyToOne(targetEntity: Album::class, inversedBy: 'medias', fetch: 'EAGER')]
     private ?Album $album = null;
 
     #[ORM\Column]

@@ -14,7 +14,7 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
 - **Gestion albums** — Créer, modifier, supprimer les albums
 - **Gestion médias** — Upload d'images avec validation (MIME type, taille ≤2MB)
 - **Gestion invités** — Ajouter, bloquer/débloquer, supprimer les photographes invités
-- **Contrôle d'accès** — Pagination, sécurité CSRF, authentification par token
+- **Contrôle d'accès** — Pagination, sécurité CSRF et authentification par formulaire Symfony
 
 ## 🛠 Stack Technique
 
@@ -38,8 +38,8 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
 
 1. **Cloner le repo**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/factorisation.git
-   cd factorisation
+   git clone https://github.com/Corvaxx117/OCR-Factorisation---Ina-Zaoui.git
+   cd OCR-Factorisation---Ina-Zaoui
    ```
 
 2. **Configurer l'environnement**
@@ -49,17 +49,16 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
    
    Éditer `.env.local` :
    ```
-   DATABASE_URL="postgresql://postgres:password@localhost:5432/ina_zaoui"
+   DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/ina_zaoui?serverVersion=16&charset=utf8"
    ```
 
 3. **Lancer PostgreSQL en Docker**
    ```bash
-   docker run --name postgres-dev -e POSTGRES_PASSWORD=password -e POSTGRES_DB=ina_zaoui -p 5432:5432 -d postgres:16
+   docker run --name postgres-dev -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ina_zaoui -p 5432:5432 -d postgres:16
    ```
 
 4. **Installer les dépendances**
    ```bash
-   composer install
    symfony composer install
    ```
 
@@ -72,7 +71,7 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
 6. **Importer les données (optionnel)**
    ```bash
    docker exec -i postgres-dev psql -U postgres -d ina_zaoui < backup/album.sql
-   docker exec -i postgres-dev psql -U postgres -d ina_zaoui < backup/user.sql (adapté)
+   docker exec -i postgres-dev psql -U postgres -d ina_zaoui < backup/user.sql
    docker exec -i postgres-dev psql -U postgres -d ina_zaoui < backup/media.sql
    cp backup/public/uploads/* public/uploads/
    ```
@@ -112,8 +111,14 @@ src/
 │   └── Front/         # Pages publiques
 ├── Entity/            # Entités Doctrine (User, Album, Media)
 ├── Form/              # Formulaires Symfony
+├── Pagination/         # Résultat paginé réutilisable (20 éléments/page)
 ├── Repository/        # Requêtes BDD
+├── DataFixtures/       # Jeu de données réservé à l'environnement de test
 └── Security/          # UserChecker (bloque invités inactifs)
+
+src/Service/
+├── FileUploadService.php        # Upload et suppression des fichiers médias
+└── GuestRegistrationService.php # Hash du mot de passe et création des invités
 
 templates/
 ├── base.html.twig     # Layout principal
@@ -127,7 +132,7 @@ templates/
 ### Entités
 - **User** — Représente admin et invités
   - Champs : `id`, `email`, `password`, `name`, `admin`, `active`, `roles`, `medias`
-  - Sécurité : hash bcrypt, `active` bloque la connexion
+   - Sécurité : mot de passe haché par le hasher Symfony, `active` bloque la connexion
   
 - **Album** — Groupement de médias
   - Relation : `OneToMany → Media`
@@ -136,7 +141,7 @@ templates/
 - **Media** — Images uploadées
   - Champs : `path`, `title`, `user_id`, `album_id`
   - Validation : MIME JPEG/PNG/GIF/WebP, taille ≤ 2MB
-  - Suppression : cascade (supprime fichier physique aussi)
+   - Suppression : fichier physique géré par `FileUploadService` lors de la suppression d'un média ou d'un invité
 
 ## Performance
 
@@ -158,7 +163,7 @@ disponibles dans [docs/RAPPORT_PERFORMANCE.md](docs/RAPPORT_PERFORMANCE.md).
 ## Sécurité
 
 ✅ **Implémentée**
-- ✅ Hash bcrypt de mots de passe
+- ✅ Hashage de mots de passe géré par Symfony
 - ✅ Protection CSRF sur tous les POST
 - ✅ Contrôle d'accès `#[IsGranted('ROLE_*')]`
 - ✅ Validation fichiers uploadés (MIME + taille)
@@ -184,6 +189,7 @@ symfony console lint:yaml config/            # Valider YAML
 symfony console doctrine:schema:validate     # Valider le schéma
 symfony php bin/phpunit --testdox             # Lancer les tests
 symfony php bin/phpunit --coverage-html var/coverage # Générer le rapport de couverture
+symfony console --env=test doctrine:fixtures:load --no-interaction # Recharger les données de test
 symfony composer phpstan                      # Analyser le code statiquement
 symfony composer cs:check                     # Vérifier le style sans modifier les fichiers
 symfony composer cs:fix                       # Corriger automatiquement le style
@@ -231,8 +237,16 @@ git push origin feature/guest-management
 - **Après** : 2 requêtes / 25ms (LEFT JOIN fetch)
 
 ### Pagination corrigée
+- Les listes Médias et Invités affichent au maximum 20 éléments par page
 - Les non-admins ne voient que leurs propres médias
-- Pagination basée sur le vrai nombre de résultats (pas le total global)
+- La pagination est basée sur le vrai nombre de résultats, avec un partial Twig réutilisable
+
+## Intégration continue
+
+GitHub Actions exécute automatiquement la pipeline sur chaque push et Pull
+Request vers `develop` ou `main`. Elle prépare PostgreSQL 16, applique les
+migrations et fixtures de test, puis lance PHPUnit, PHPStan niveau 8 et PHP CS
+Fixer. Le workflow peut aussi être exécuté manuellement depuis l'onglet Actions.
 
 ## Contribution
 

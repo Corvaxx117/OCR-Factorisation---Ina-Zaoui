@@ -156,6 +156,7 @@ symfony console doctrine:schema:validate
 symfony console cache:clear
 
 # Lancer les tests
+symfony console --env=test doctrine:fixtures:load --no-interaction
 symfony php bin/phpunit --testdox
 symfony php bin/phpunit --coverage-html var/coverage
 
@@ -224,8 +225,15 @@ Avant de soumettre une PR :
 
 - Optimiser les requêtes : utiliser `LEFT JOIN` au lieu de lazy loading
 - Éviter le N+1 : pré-charger les relations avec `->addSelect('...')`
-- Paginer les grandes listes (max 25-50 items par page)
+- Paginer les grandes listes avec `PaginatedResult` (20 éléments par page)
 - Compresser les images (max 2MB)
+
+## Intégration continue
+
+Chaque push et Pull Request vers `develop` ou `main` déclenche GitHub Actions.
+La pipeline prépare PostgreSQL, applique migrations et fixtures, puis exécute
+PHPUnit, PHPStan et PHP CS Fixer. Une contribution ne doit être fusionnée que
+lorsque tous ces contrôles sont verts.
 
 ## Documentation
 
