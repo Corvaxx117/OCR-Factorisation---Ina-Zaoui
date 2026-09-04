@@ -2,8 +2,8 @@
 
 namespace App\Controller\Admin\Guest;
 
-use App\Repository\UserRepository;
 use App\Pagination\PaginatedResult;
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
