@@ -46,9 +46,19 @@ class UserCheckerTest extends TestCase
     {
         // UserChecker ne connaît que App\Entity\User : tout autre UserInterface doit être ignoré sans erreur.
         $otherUser = new class implements UserInterface {
-            public function getRoles(): array { return []; }
-            public function eraseCredentials(): void {}
-            public function getUserIdentifier(): string { return 'other'; }
+            public function getRoles(): array
+            {
+                return [];
+            }
+
+            public function eraseCredentials(): void
+            {
+            }
+
+            public function getUserIdentifier(): string
+            {
+                return 'other';
+            }
         };
 
         $this->checker->checkPreAuth($otherUser);

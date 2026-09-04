@@ -4,9 +4,9 @@ namespace App\Tests\Functional\Security;
 
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 
 /**
  * WebTestCase simule un vrai navigateur (client HTTP interne) sans réseau ni serveur réel :

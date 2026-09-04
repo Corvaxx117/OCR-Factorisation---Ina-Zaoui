@@ -26,9 +26,8 @@ class AddAction extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         FileUploadService $fileUploadService,
-        #[CurrentUser] User $currentUser
-        )
-    {
+        #[CurrentUser] User $currentUser,
+    ) {
         $media = new Media();
         $form = $this->createForm(MediaType::class, $media, ['is_admin' => $this->isGranted('ROLE_ADMIN')]);
         $form->handleRequest($request);

@@ -24,9 +24,8 @@ class DeleteAction extends AbstractController
     public function __invoke(
         Request $request,
         #[MapEntity(id: 'id')] Album $album,
-        EntityManagerInterface $em
-    )
-    {
+        EntityManagerInterface $em,
+    ) {
         $this->denyAccessUnlessValidCsrfToken('delete-album-'.$album->getId(), $request);
 
         $em->remove($album);

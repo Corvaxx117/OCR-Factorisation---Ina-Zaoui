@@ -21,7 +21,7 @@ class GuestAction extends AbstractController
         }
 
         return $this->render('front/guest.html.twig', [
-            'guest' => $guest
+            'guest' => $guest,
         ]);
     }
 }

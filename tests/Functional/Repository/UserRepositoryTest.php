@@ -63,7 +63,7 @@ class UserRepositoryTest extends KernelTestCase
         $this->em->clear(); // on vide l'identity map pour forcer une vraie relecture depuis la BDD
 
         $result = $this->userRepository->findActiveGuestsWithMedias();
-        $reloadedGuest = current(array_filter($result, static fn (User $u) => $u->getEmail() === 'guest-with-media@test.local'));
+        $reloadedGuest = current(array_filter($result, static fn (User $u) => 'guest-with-media@test.local' === $u->getEmail()));
 
         $this->assertNotFalse($reloadedGuest);
         // Le LEFT JOIN + addSelect('m') doit avoir chargé les médias en même temps que l'utilisateur (pas de requête supplémentaire).

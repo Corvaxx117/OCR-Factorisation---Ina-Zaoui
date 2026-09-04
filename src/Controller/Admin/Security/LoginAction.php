@@ -19,7 +19,7 @@ class LoginAction extends AbstractController
 
         return $this->render('admin/login.html.twig', [
             'last_username' => $lastUsername,
-            'error'         => $error,
+            'error' => $error,
         ]);
     }
 }

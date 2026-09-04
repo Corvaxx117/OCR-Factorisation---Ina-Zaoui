@@ -152,6 +152,9 @@ templates/
 - Bonnes pratiques : 96
 - SEO : 54 (noindex en dev, sera 90+ en prod)
 
+Les mesures detaillees et la comparaison avant/apres de la page Invites sont
+disponibles dans [docs/RAPPORT_PERFORMANCE.md](docs/RAPPORT_PERFORMANCE.md).
+
 ## Sécurité
 
 ✅ **Implémentée**
@@ -179,6 +182,12 @@ symfony console doctrine:migrations:migrate   # Appliquer les migrations
 symfony console lint:twig templates/         # Valider Twig
 symfony console lint:yaml config/            # Valider YAML
 symfony console doctrine:schema:validate     # Valider le schéma
+symfony php bin/phpunit --testdox             # Lancer les tests
+symfony php bin/phpunit --coverage-html var/coverage # Générer le rapport de couverture
+symfony composer phpstan                      # Analyser le code statiquement
+symfony composer cs:check                     # Vérifier le style sans modifier les fichiers
+symfony composer cs:fix                       # Corriger automatiquement le style
+symfony composer quality                      # Exécuter PHPStan et le contrôle de style
 
 # Git
 git checkout develop

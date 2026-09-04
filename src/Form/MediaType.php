@@ -29,8 +29,8 @@ class MediaType extends AbstractType
                         'image/png',
                         'image/gif',
                         'image/webp',
-                    ], mimeTypesMessage: 'Veuillez uploader une image valide (JPEG, PNG, GIF, WebP).')
-                ]
+                    ], mimeTypesMessage: 'Veuillez uploader une image valide (JPEG, PNG, GIF, WebP).'),
+                ],
             ])
             ->add('title', TextType::class, [
                 'label' => 'Titre',

@@ -15,9 +15,9 @@ class GuestsAction extends AbstractController
     public function __invoke(UserRepository $userRepository)
     {
         $guests = $userRepository->findActiveGuestsWithMedias();
-        
+
         return $this->render('front/guests.html.twig', [
-            'guests' => $guests
+            'guests' => $guests,
         ]);
     }
 }

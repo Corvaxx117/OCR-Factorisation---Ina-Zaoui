@@ -155,8 +155,15 @@ symfony console doctrine:schema:validate
 # Vider le cache
 symfony console cache:clear
 
-# Lancer les tests (quand implémentés)
-symfony console --env=test
+# Lancer les tests
+symfony php bin/phpunit --testdox
+symfony php bin/phpunit --coverage-html var/coverage
+
+# Analyse statique et style
+symfony composer phpstan
+symfony composer cs:check
+symfony composer cs:fix
+symfony composer quality
 ```
 
 ## Standards de code

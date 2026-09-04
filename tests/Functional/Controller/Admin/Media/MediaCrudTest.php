@@ -8,6 +8,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
@@ -76,7 +77,9 @@ class MediaCrudTest extends WebTestCase
         $form = $crawler->filter('form')->form([
             'media[title]' => 'Photo valide',
         ]);
-        $form['media[file]']->upload($this->createTestPngFile());
+        /** @var FileFormField $fileField */
+        $fileField = $form['media[file]'];
+        $fileField->upload($this->createTestPngFile());
         $this->client->submit($form);
 
         $this->assertResponseRedirects('/admin/media');
@@ -97,7 +100,9 @@ class MediaCrudTest extends WebTestCase
         $form = $crawler->filter('form')->form([
             'media[title]' => 'Fichier invalide',
         ]);
-        $form['media[file]']->upload($this->createTestTextFile());
+        /** @var FileFormField $fileField */
+        $fileField = $form['media[file]'];
+        $fileField->upload($this->createTestTextFile());
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful(); // reste sur le formulaire, aucune redirection

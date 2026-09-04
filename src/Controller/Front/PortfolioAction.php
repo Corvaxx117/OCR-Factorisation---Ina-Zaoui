@@ -23,7 +23,7 @@ class PortfolioAction extends AbstractController
         return $this->render('front/portfolio.html.twig', [
             'albums' => $albums,
             'album' => $album,
-            'medias' => $medias
+            'medias' => $medias,
         ]);
     }
 }

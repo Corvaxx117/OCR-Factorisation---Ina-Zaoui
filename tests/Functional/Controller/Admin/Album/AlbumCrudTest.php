@@ -4,7 +4,6 @@ namespace App\Tests\Functional\Controller\Admin\Album;
 
 use App\DataFixtures\AppFixtures;
 use App\Entity\Album;
-use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;

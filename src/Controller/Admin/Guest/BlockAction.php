@@ -25,9 +25,8 @@ class BlockAction extends AbstractController
     public function __invoke(
         Request $request,
         #[MapEntity(id: 'id')] User $guest,
-        EntityManagerInterface $em
-    ): Response
-    {
+        EntityManagerInterface $em,
+    ): Response {
         $this->denyAccessUnlessValidCsrfToken('block-guest-'.$guest->getId(), $request);
 
         $guest->setActive(!$guest->isActive());
