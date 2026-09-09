@@ -97,7 +97,7 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
 - **Rôle** : `ROLE_USER`
 - **Accès** : Voir/gérer seulement ses propres médias
 
-## 📐 Architecture
+## Architecture
 
 ### Répertoires clés
 ```
@@ -162,15 +162,15 @@ disponibles dans [docs/RAPPORT_PERFORMANCE.md](docs/RAPPORT_PERFORMANCE.md).
 
 ## Sécurité
 
-✅ **Implémentée**
-- ✅ Hashage de mots de passe géré par Symfony
-- ✅ Protection CSRF sur tous les POST
-- ✅ Contrôle d'accès `#[IsGranted('ROLE_*')]`
-- ✅ Validation fichiers uploadés (MIME + taille)
-- ✅ `UserChecker` — bloque les comptes inactifs
-- ✅ Suppression en cascade des médias orphelins
+ **Implémentée**
+-  Hashage de mots de passe géré par Symfony
+-  Protection CSRF sur tous les POST
+-  Contrôle d'accès `#[IsGranted('ROLE_*')]`
+-  Validation fichiers uploadés (MIME + taille)
+-  `UserChecker` — bloque les comptes inactifs
+-  Suppression en cascade des médias orphelins
 
-## 🚀 Commandes utiles
+## Commandes utiles
 
 ```bash
 # Développement
@@ -224,13 +224,13 @@ git push origin feature/guest-management
 ## Points clés du projet
 
 ### Corrections effectuées
-- ✅ Migration Symfony 5.4 → 8.1 (avec corrections de breaking changes)
-- ✅ PHP 8.2 → PHP 8.4 (PHP 8.4 native)
-- ✅ Single Action Controllers (découpage des controllers)
-- ✅ Injection de dépendances (plus de `getDoctrine()`)
-- ✅ Attributs PHP 8 (`#[Route]`, `#[ORM\*]`)
-- ✅ Validation complète des entités
-- ✅ Tests de sécurité (CSRF, authentification, autorisation)
+-  Migration Symfony 5.4 → 8.1 (avec corrections de breaking changes)
+-  PHP 8.2 → PHP 8.4 (PHP 8.4 native)
+-  Single Action Controllers (découpage des controllers)
+-  Injection de dépendances (plus de `getDoctrine()`)
+-  Attributs PHP 8 (`#[Route]`, `#[ORM\*]`)
+-  Validation complète des entités
+-  Tests de sécurité (CSRF, authentification, autorisation)
 
 ### N+1 queries résolu
 - **Avant** : 102 requêtes / 181ms sur `/guests`

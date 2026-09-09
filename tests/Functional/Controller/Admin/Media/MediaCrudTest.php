@@ -42,7 +42,7 @@ class MediaCrudTest extends WebTestCase
     {
         // DAMA annule la BDD, mais pas les fichiers réellement déplacés sur disque par FileUploadService.
         foreach ($this->uploadedFiles as $path) {
-            @unlink($path);
+            @unlink($this->getPublicUploadPath($path));
         }
 
         parent::tearDown(); // indispensable : arrête proprement le kernel avant le test suivant
@@ -110,12 +110,12 @@ class MediaCrudTest extends WebTestCase
         $this->em->clear();
         $media = $this->em->getRepository(Media::class)->findOneBy(['title' => 'Photo valide']);
         $this->assertNotNull($media);
+        $this->uploadedFiles[] = $media->getPath();
         $this->assertInstanceOf(User::class, $guest);
         $owner = $media->getUser();
         $this->assertInstanceOf(User::class, $owner);
         $this->assertSame($guest->getId(), $owner->getId());
-        $this->uploadedFiles[] = $media->getPath();
-        $this->assertFileExists($media->getPath());
+        $this->assertFileExists($this->getPublicUploadPath($media->getPath()));
     }
 
     public function testAddMediaRejectsInvalidMimeType(): void
@@ -195,6 +195,11 @@ class MediaCrudTest extends WebTestCase
         $this->em->flush();
 
         return $media;
+    }
+
+    private function getPublicUploadPath(string $path): string
+    {
+        return dirname(__DIR__, 5).'/public/uploads/'.basename($path);
     }
 
     private function createTestPngFile(): string

@@ -33,11 +33,6 @@ class Media
     #[Assert\Length(max: 255, maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères.')]
     private string $title;
 
-    #[Assert\File(
-        maxSize: '2M',
-        mimeTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-        mimeTypesMessage: 'Veuillez uploader une image valide (JPEG, PNG, GIF, WebP).'
-    )]
     private ?UploadedFile $file = null;
 
     public function getId(): ?int

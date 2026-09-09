@@ -7,11 +7,13 @@ namespace App\Tests\Unit\Entity;
 use App\Entity\Album;
 use App\Entity\Media;
 use App\Entity\User;
-use PHPUnit\Framework\Attributes\DataProvider;
+use App\Form\MediaType;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Validation;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Tests unitaires de l'entité Media : relations (User, Album) et accesseurs simples.
@@ -19,23 +21,16 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class MediaTest extends TestCase
 {
     private Media $media;
-    private ValidatorInterface $validator;
-    /** @var list<string> */
-    private array $tmpFiles = [];
+    private FormFactoryInterface $formFactory;
 
     // Exécuté avant CHAQUE test de cette classe : $media repart neuve à chaque fois, aucun état partagé entre tests.
     protected function setUp(): void
     {
         $this->media = new Media();
-        // Validator construit directement depuis le composant, sans booter le kernel : toujours un test unitaire pur.
-        $this->validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
-    }
-
-    protected function tearDown(): void
-    {
-        foreach ($this->tmpFiles as $path) {
-            @unlink($path);
-        }
+        $validator = Validation::createValidatorBuilder()->enableAttributeMapping()->getValidator();
+        $this->formFactory = Forms::createFormFactoryBuilder()
+            ->addExtension(new ValidatorExtension($validator))
+            ->getFormFactory();
     }
 
     public function testTitleAndPathAreStored(): void
@@ -70,53 +65,14 @@ class MediaTest extends TestCase
         $this->assertNull($this->media->getAlbum());
     }
 
-    #[DataProvider('invalidFileProvider')]
-    public function testInvalidFileIsRejectedByValidation(string $content, int $totalSize, string $originalName): void
+    public function testFormDefinesFileUploadConstraints(): void
     {
-        $file = $this->createFakeUploadedFile($content, $totalSize, $originalName);
+        $form = $this->formFactory->create(MediaType::class, new Media());
+        $constraints = $form->get('file')->getConfig()->getOption('constraints');
 
-        $violations = $this->validator->validatePropertyValue(Media::class, 'file', $file);
-
-        $this->assertGreaterThan(0, $violations->count(), 'Ce fichier aurait dû être rejeté par la contrainte Assert\File.');
-    }
-
-    /** @return iterable<string, array{string, int, string}> */
-    public static function invalidFileProvider(): iterable
-    {
-        // Contenu texte brut : aucun magic number image, détecté comme text/plain par finfo.
-        yield 'wrong mime type (text file renamed .jpg)' => ["Ceci n'est pas une image", 1024, 'fake.jpg'];
-
-        // PNG minimal valide mais poids total > 2M une fois du bourrage ajouté (limite maxSize de la contrainte).
-        yield 'oversized PNG (> 2M)' => [self::minimalPngContent(), 2 * 1024 * 1024 + 1, 'too-big.png'];
-    }
-
-    public function testValidFileIsAcceptedByValidation(): void
-    {
-        // PNG 1x1 minimal réel, sous la limite de taille : aucune violation attendue.
-        $file = $this->createFakeUploadedFile(self::minimalPngContent(), 0, 'valid.png');
-
-        $violations = $this->validator->validatePropertyValue(Media::class, 'file', $file);
-
-        $this->assertCount(0, $violations);
-    }
-
-    // PNG 1x1 pixel transparent valide (nécessaire pour que finfo détecte réellement "image/png").
-    private static function minimalPngContent(): string
-    {
-        return base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
-    }
-
-    private function createFakeUploadedFile(string $content, int $totalSize, string $originalName): UploadedFile
-    {
-        $path = tempnam(sys_get_temp_dir(), 'media_test_');
-
-        if (false === $path) {
-            throw new \RuntimeException('Impossible de créer le fichier temporaire.');
-        }
-        file_put_contents($path, $content.str_repeat("\0", max(0, $totalSize - strlen($content))));
-        $this->tmpFiles[] = $path;
-
-        // $test=true : bypasse la vérification is_uploaded_file() (impossible à satisfaire hors requête HTTP réelle).
-        return new UploadedFile($path, $originalName, null, null, true);
+        $this->assertCount(1, $constraints);
+        $this->assertInstanceOf(File::class, $constraints[0]);
+        $this->assertSame(2_000_000, $constraints[0]->maxSize);
+        $this->assertSame(['image/jpeg', 'image/png', 'image/gif', 'image/webp'], $constraints[0]->mimeTypes);
     }
 }

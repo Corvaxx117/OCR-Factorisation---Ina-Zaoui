@@ -23,7 +23,13 @@ class DeleteAction extends AbstractController
     use AdminActionTrait;
 
     #[Route(path: '/admin/media/delete/{id}', name: 'admin_media_delete', methods: ['POST'])]
-    public function __invoke(Request $request, #[MapEntity(id: 'id')] Media $media, EntityManagerInterface $em, FileUploadService $fileUploadService, #[CurrentUser] User $currentUser): Response
+    public function __invoke(
+        Request $request,
+        #[MapEntity(id: 'id')] Media $media,
+        EntityManagerInterface $em,
+        FileUploadService $fileUploadService,
+        #[CurrentUser] User $currentUser
+    ): Response
     {
         $this->denyAccessUnlessValidCsrfToken('delete-media-'.$media->getId(), $request);
 
