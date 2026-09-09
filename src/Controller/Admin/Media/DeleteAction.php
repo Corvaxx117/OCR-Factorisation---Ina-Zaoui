@@ -28,9 +28,8 @@ class DeleteAction extends AbstractController
         #[MapEntity(id: 'id')] Media $media,
         EntityManagerInterface $em,
         FileUploadService $fileUploadService,
-        #[CurrentUser] User $currentUser
-    ): Response
-    {
+        #[CurrentUser] User $currentUser,
+    ): Response {
         $this->denyAccessUnlessValidCsrfToken('delete-media-'.$media->getId(), $request);
 
         if (!$this->isGranted('ROLE_ADMIN') && $media->getUser() !== $currentUser) {
