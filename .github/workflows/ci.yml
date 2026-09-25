@@ -45,7 +45,7 @@ jobs:
         with:
           php-version: '8.4'
           extensions: ctype, iconv, intl, mbstring, pdo_pgsql
-          coverage: none
+          coverage: pcov
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -65,7 +65,17 @@ jobs:
           php bin/console doctrine:fixtures:load --env=test --no-interaction
 
       - name: Run test suite
-        run: php bin/phpunit --testdox
+        run: php bin/phpunit --testdox --coverage-html var/coverage --coverage-clover var/coverage.xml
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            var/coverage/
+            var/coverage.xml
+          if-no-files-found: warn
 
       - name: Warm up development cache for PHPStan
         env:
