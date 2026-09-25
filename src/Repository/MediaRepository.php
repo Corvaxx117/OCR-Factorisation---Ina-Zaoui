@@ -21,13 +21,20 @@ class MediaRepository extends ServiceEntityRepository
 
     /**
      * Médias du portfolio public : ceux de l'album donné, ou ceux de l'admin par défaut.
+     * Les médias appartenant à un invité bloqué ne sont jamais exposés publiquement.
      *
      * @return list<Media>
      */
     public function findPortfolioMedias(?Album $album): array
     {
-        if ($album) {
-            return $this->findBy(['album' => $album]);
+        if ($album instanceof Album) {
+            return $this->createQueryBuilder('m')
+                ->leftJoin('m.user', 'u')
+                ->where('m.album = :album')
+                ->andWhere('u.id IS NULL OR u.active = true')
+                ->setParameter('album', $album)
+                ->getQuery()
+                ->getResult();
         }
 
         return $this->createQueryBuilder('m')

@@ -105,6 +105,17 @@ class FrontOfficeTest extends WebTestCase
         $this->assertSelectorExists('img[alt="Photo invité actif"]');
     }
 
+    public function testFilteredPortfolioHidesMediasOwnedByBlockedGuest(): void
+    {
+        $album = $this->em->getRepository(Album::class)->findOneBy(['name' => 'Portfolio de test']);
+        $this->assertNotNull($album);
+
+        $this->client->request('GET', '/portfolio/'.$album->getId());
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorNotExists('img[alt="Photo invité bloqué"]');
+    }
+
     private function findUserByEmail(string $email): User
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => $email]);

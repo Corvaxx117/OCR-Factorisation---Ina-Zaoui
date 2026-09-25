@@ -43,6 +43,7 @@ class AppFixtures extends Fixture
 
         $manager->persist($this->createMedia('Photo admin', 'uploads/fixtures/admin.jpg', $admin, $portfolioAlbum));
         $manager->persist($this->createMedia('Photo invité actif', 'uploads/fixtures/guest-active.jpg', $activeGuest, $portfolioAlbum));
+        $manager->persist($this->createMedia('Photo invité bloqué', 'uploads/fixtures/guest-blocked.jpg', $blockedGuest, $portfolioAlbum));
 
         $this->addReference(self::ADMIN_REFERENCE, $admin);
         $this->addReference(self::ACTIVE_GUEST_REFERENCE, $activeGuest);

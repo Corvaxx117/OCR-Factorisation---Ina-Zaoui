@@ -4,7 +4,7 @@
 
 La suite repose sur PHPUnit 11, PostgreSQL 16, PCOV pour la couverture et
 `dama/doctrine-test-bundle` pour l'isolation transactionnelle. Elle contient 57
-tests et 185 assertions, avec 88,01 % de lignes couvertes, au-dessus de
+tests et 192 assertions, avec 88,32 % de lignes couvertes, au-dessus de
 l'objectif de 70 %.
 
 ## Organisation
@@ -21,7 +21,7 @@ tests/
 - Les tests fonctionnels utilisent `KernelTestCase` ou `WebTestCase` : ils
   valident Doctrine, les formulaires, les routes, la securite et les templates.
 - Les fixtures de `AppFixtures` fournissent un administrateur, un invite actif,
-  un invite bloque, deux albums et deux medias pour l'environnement `test`.
+  un invite bloque, deux albums et trois medias pour l'environnement `test`.
 - Les factories privees presentes dans les tests servent uniquement aux donnees
   propres a un scenario, par exemple un media a supprimer ou une seconde page.
 
@@ -33,6 +33,8 @@ tests/
   CSRF, validation et pagination a 20 elements par page.
 - Front Office : accueil, a propos, portfolio par defaut et par album, liste des
   invites actifs et profils inaccessibles pour les comptes bloques ou admin.
+- Confidentialite : les medias appartenant a un invite bloque n'apparaissent ni
+  sur le portfolio par defaut ni sur le portfolio filtre par album.
 - Performance : le repository des invites charge les medias par `LEFT JOIN` pour
   eviter le N+1.
 
