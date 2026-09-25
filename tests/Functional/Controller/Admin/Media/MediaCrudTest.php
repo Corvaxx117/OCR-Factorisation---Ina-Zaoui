@@ -136,6 +136,24 @@ class MediaCrudTest extends WebTestCase
         $this->assertNull($this->em->getRepository(Media::class)->findOneBy(['title' => 'Fichier invalide']));
     }
 
+    public function testAddMediaRejectsFileLargerThanTwoMegabytes(): void
+    {
+        $this->loginAs(admin: false);
+
+        $crawler = $this->client->request('GET', '/admin/media/add');
+        $form = $crawler->filter('form')->form([
+            'media[title]' => 'Fichier trop lourd',
+        ]);
+        /** @var FileFormField $fileField */
+        $fileField = $form['media[file]'];
+        $fileField->upload($this->createTestPngFile(2 * 1024 * 1024 + 1));
+        $this->client->submit($form);
+
+        $this->assertResponseIsSuccessful();
+        $this->em->clear();
+        $this->assertNull($this->em->getRepository(Media::class)->findOneBy(['title' => 'Fichier trop lourd']));
+    }
+
     public function testOwnerCanDeleteTheirOwnMedia(): void
     {
         $guest = $this->loginAs(admin: false);
@@ -202,10 +220,11 @@ class MediaCrudTest extends WebTestCase
         return dirname(__DIR__, 5).'/public/uploads/'.basename($path);
     }
 
-    private function createTestPngFile(): string
+    private function createTestPngFile(int $padding = 0): string
     {
         $path = tempnam(sys_get_temp_dir(), 'media_crud_test_').'.png';
-        file_put_contents($path, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='));
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
+        file_put_contents($path, $png.str_repeat("\0", max(0, $padding - strlen($png))));
 
         return $path;
     }
