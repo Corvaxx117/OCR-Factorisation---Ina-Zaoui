@@ -20,6 +20,11 @@ Deux indicateurs sont releves :
 2. La taille HTML transferee (`size_download`) : poids de la reponse initiale,
    hors images, feuilles de style et scripts charges ensuite par le navigateur.
 
+Le Symfony Profiler fournit deux indicateurs serveur complementaires : le
+nombre de requetes SQL et leur temps cumule. Les valeurs ci-dessous ont ete
+relevees sur les profils HTTP generes le 12 septembre 2026 avec la base locale
+de developpement.
+
 Commande reproductible :
 
 ```bash
@@ -29,13 +34,13 @@ curl -sk -o /dev/null -w '%{http_code} %{time_total} %{size_download}\n' \
 
 ## Mesures Front Office actuelles
 
-| Page | Statut HTTP | Temps HTTP moyen | Taille HTML |
-|---|---:|---:|---:|
-| `/` | 200 | 32,7 ms | 51 161 octets |
-| `/about` | 200 | 28,6 ms | 52 056 octets |
-| `/portfolio` | 200 | 68,6 ms | 64 915 octets |
-| `/guests` | 200 | 201,0 ms | 75 227 octets |
-| `/guest/2` (invite actif) | 200 | 60,0 ms | 60 004 octets |
+| Page | Statut HTTP | Temps HTTP moyen | Taille HTML | Requetes SQL | Temps SQL |
+|---|---:|---:|---:|---:|---:|
+| `/` | 200 | 32,7 ms | 51 161 octets | 0 | 0,00 ms |
+| `/about` | 200 | 28,6 ms | 52 056 octets | 0 | 0,00 ms |
+| `/portfolio` | 200 | 68,6 ms | 64 915 octets | 3 | 9,27 ms |
+| `/guests` | 200 | 201,0 ms | 75 227 octets | 1 | 40,32 ms |
+| `/guest/2` (invite actif) | 200 | 60,0 ms | 60 004 octets | 2 | 11,91 ms |
 
 `/guests` est naturellement la page la plus couteuse : elle affiche la liste
 des invites et le nombre de leurs medias. Son temps HTTP reste sous 250 ms dans

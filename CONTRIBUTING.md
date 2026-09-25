@@ -4,7 +4,7 @@ Merci de vouloir contribuer au projet Ina Zaoui ! Ce document explique comment p
 
 ## Prérequis
 
-- Symfony 8.1+ LTS
+- Symfony 8.1+ (version stable du projet ; la LTS actuelle est Symfony 7.4)
 - PHP 8.4+
 - PostgreSQL 16
 - Docker Desktop
@@ -150,7 +150,7 @@ symfony console lint:twig templates/
 symfony console lint:yaml config/
 
 # Valider le schéma BDD
-symfony console doctrine:schema:validate
+symfony console doctrine:schema:validate --env=test
 
 # Vider le cache
 symfony console cache:clear

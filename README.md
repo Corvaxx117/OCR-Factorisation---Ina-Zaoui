@@ -20,7 +20,7 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
 
 | Technologie | Version |
 |------------|---------|
-| Symfony | 8.1 LTS |
+| Symfony | 8.1 stable (LTS actuelle : 7.4) |
 | PHP | 8.4 |
 | PostgreSQL | 16 (Docker) |
 | Bootstrap | 5.3.3 |
@@ -186,7 +186,7 @@ symfony console doctrine:migrations:migrate   # Appliquer les migrations
 # Tests
 symfony console lint:twig templates/         # Valider Twig
 symfony console lint:yaml config/            # Valider YAML
-symfony console doctrine:schema:validate     # Valider le schéma
+symfony console doctrine:schema:validate --env=test # Valider le schéma de test
 symfony php bin/phpunit --testdox             # Lancer les tests
 symfony php bin/phpunit --coverage-html var/coverage # Générer le rapport de couverture
 symfony console --env=test doctrine:fixtures:load --no-interaction # Recharger les données de test
@@ -246,7 +246,9 @@ git push origin feature/guest-management
 GitHub Actions exécute automatiquement la pipeline sur chaque push et Pull
 Request vers `develop` ou `main`. Elle prépare PostgreSQL 16, applique les
 migrations et fixtures de test, puis lance PHPUnit, PHPStan niveau 8 et PHP CS
-Fixer. Le workflow peut aussi être exécuté manuellement depuis l'onglet Actions.
+Fixer. PHPUnit génère aussi `var/coverage` et `var/coverage.xml`, publiés comme
+artefact `coverage-report` dans chaque exécution. Le workflow peut aussi être
+exécuté manuellement depuis l'onglet Actions.
 
 ## Contribution
 
