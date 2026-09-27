@@ -118,6 +118,31 @@ class MediaCrudTest extends WebTestCase
         $this->assertFileExists($this->getPublicUploadPath($media->getPath()));
     }
 
+    public function testAdminCannotAssignMediaToAnotherUser(): void
+    {
+        $admin = $this->loginAs(admin: true);
+
+        $crawler = $this->client->request('GET', '/admin/media/add');
+        $this->assertSelectorNotExists('[name="media[user]"]');
+
+        $form = $crawler->filter('form')->form([
+            'media[title]' => 'Photo de la photographe',
+        ]);
+        /** @var FileFormField $fileField */
+        $fileField = $form['media[file]'];
+        $fileField->upload($this->createTestPngFile());
+        $this->client->submit($form);
+
+        $this->assertResponseRedirects('/admin/media');
+
+        $this->em->clear();
+        $media = $this->em->getRepository(Media::class)->findOneBy(['title' => 'Photo de la photographe']);
+        $this->assertNotNull($media);
+        $this->uploadedFiles[] = $media->getPath();
+        $this->assertInstanceOf(User::class, $admin);
+        $this->assertSame($admin->getId(), $media->getUser()->getId());
+    }
+
     public function testAddMediaRejectsInvalidMimeType(): void
     {
         $this->loginAs(admin: false);
@@ -132,6 +157,7 @@ class MediaCrudTest extends WebTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful(); // reste sur le formulaire, aucune redirection
+        $this->assertSelectorTextContains('.invalid-feedback, .form-error-message', 'Veuillez uploader une image valide');
         $this->em->clear();
         $this->assertNull($this->em->getRepository(Media::class)->findOneBy(['title' => 'Fichier invalide']));
     }
@@ -150,6 +176,7 @@ class MediaCrudTest extends WebTestCase
         $this->client->submit($form);
 
         $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('.invalid-feedback, .form-error-message', 'Le fichier est trop volumineux');
         $this->em->clear();
         $this->assertNull($this->em->getRepository(Media::class)->findOneBy(['title' => 'Fichier trop lourd']));
     }

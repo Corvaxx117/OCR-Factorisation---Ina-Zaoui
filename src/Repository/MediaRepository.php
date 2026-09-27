@@ -29,9 +29,9 @@ class MediaRepository extends ServiceEntityRepository
     {
         if ($album instanceof Album) {
             return $this->createQueryBuilder('m')
-                ->leftJoin('m.user', 'u')
+                ->join('m.user', 'u')
                 ->where('m.album = :album')
-                ->andWhere('u.id IS NULL OR u.active = true')
+                ->andWhere('u.active = true')
                 ->setParameter('album', $album)
                 ->getQuery()
                 ->getResult();
