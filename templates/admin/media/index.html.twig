@@ -27,39 +27,16 @@
                         <td>{{ media.album.name ?? '' }}</td>
                     {% endif %}
                     <td>
-                        <a href="{{ path('admin_media_delete', {id: media.id}) }}" class="btn btn-danger">Supprimer</a>
+                        <form method="post" action="{{ path('admin_media_delete', {id: media.id}) }}" 
+                            style="display:inline" 
+                            onsubmit="return confirm('Êtes-vous sûr ?')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-media-' ~ media.id) }}">
+                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                        </form>
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
-    {% set totalPages = (total / 50)|round(0, 'ceil') %}
-
-    <nav aria-label="Page navigation">
-        <ul class="pagination">
-            {% if page > 1 %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ path('admin_media_index', {page: 1}) }}">Première page</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="{{ path('admin_media_index', {page: page - 1}) }}">Précédent</a>
-                </li>
-            {% endif %}
-
-            {% for i in range(max(1, page - 3), min(totalPages, page + 3)) %}
-                <li class="page-item {% if i == page %}active{% endif %}">
-                    <a class="page-link" href="{{ path('admin_media_index', {page: i}) }}">{{ i }}</a>
-                </li>
-            {% endfor %}
-
-            {% if page < totalPages %}
-                <li class="page-item">
-                    <a class="page-link" href="{{ path('admin_media_index', {page: page + 1}) }}">Suivant</a>
-                </li>
-                <li class="page-item">
-                    <a class="page-link" href="{{ path('admin_media_index', {page: totalPages}) }}">Dernière page</a>
-                </li>
-            {% endif %}
-        </ul>
-    </nav>
+    {% include 'admin/_pagination.html.twig' with {pagination: pagination, route: 'admin_media_index'} %}
 {% endblock %}

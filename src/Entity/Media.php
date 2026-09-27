@@ -5,7 +5,12 @@ namespace App\Entity;
 use App\Repository\MediaRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/**
+ * Entité représentant un média (photo) uploadé.
+ * Associé à un utilisateur et optionnellement à un album.
+ */
 #[ORM\Entity(repositoryClass: MediaRepository::class)]
 class Media
 {
@@ -14,16 +19,18 @@ class Media
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: "medias", fetch: "EAGER")]
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'medias', fetch: 'EAGER')]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Album::class, fetch: "EAGER")]
+    #[ORM\ManyToOne(targetEntity: Album::class, inversedBy: 'medias', fetch: 'EAGER')]
     private ?Album $album = null;
 
     #[ORM\Column]
     private string $path;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'Le titre est obligatoire.')]
+    #[Assert\Length(max: 255, maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères.')]
     private string $title;
 
     private ?UploadedFile $file = null;
