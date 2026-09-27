@@ -70,8 +70,8 @@ symfony console --env=test doctrine:fixtures:load --no-interaction
 # Suite de tests
 symfony php bin/phpunit --testdox
 
-# Couverture (rapport HTML dans var/coverage)
-symfony php bin/phpunit --coverage-html var/coverage
+# Couverture (rapport HTML versionné dans TestCoverage/)
+symfony php bin/phpunit --coverage-html TestCoverage
 
 # Analyse statique et style
 symfony composer quality     # PHPStan niveau 8 + vérification du style

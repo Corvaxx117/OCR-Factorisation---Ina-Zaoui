@@ -205,9 +205,16 @@ Les commandes de tests, de couverture et d'analyse statique sont décrites dans 
 GitHub Actions exécute automatiquement la pipeline sur chaque push et Pull
 Request vers `develop` ou `main`. Elle prépare PostgreSQL 16, applique les
 migrations et fixtures de test, puis lance PHPUnit, PHPStan niveau 8 et PHP CS
-Fixer. PHPUnit génère aussi `var/coverage` et `var/coverage.xml`, publiés comme
+Fixer. PHPUnit génère aussi `TestCoverage` et `var/coverage.xml`, publiés comme
 artefact `coverage-report` dans chaque exécution. Le workflow peut aussi être
 exécuté manuellement depuis l'onglet Actions.
+
+Le dernier rapport de couverture est versionné dans `TestCoverage/` et s'ouvre
+sans serveur :
+
+```bash
+open TestCoverage/index.html
+```
 
 ## Contribution
 
