@@ -63,6 +63,46 @@ avec un `LEFT JOIN` et `addSelect('m')`. Doctrine recupere alors les invites et
 leurs medias dans une seule requete de lecture, ce qui evite les acces SQL
 repetes pendant le rendu Twig.
 
+## Arbitrage `addSelect` contre `fetch: EAGER`
+
+Deux strategies permettent de supprimer ce N+1. Elles ont ete mesurees sur la
+base de developpement (99 invites, 5 053 medias), trois passes de sept requetes
+chacune, mediane retenue.
+
+| Strategie | Requetes SQL | Temps SQL | HTTP median |
+|---|---:|---:|---:|
+| Chargement paresseux (etat initial) | 99 | 261 ms | 541 ms |
+| `fetch: 'EAGER'` sur `User::$medias` | 2 | ~40 ms | ~257 ms |
+| `LEFT JOIN` + `addSelect` (retenu) | 1 | ~40 ms | ~229 ms |
+
+Contrairement a une idee repandue, `EAGER` sur une association `OneToMany` ne
+reproduit pas le N+1 : Doctrine regroupe le chargement des collections en une
+seule requete `WHERE user_id IN (...)`. Les deux strategies resolvent donc
+reellement le probleme, et l'ecart de temps SQL entre elles reste inferieur a la
+dispersion observee entre deux passes.
+
+Le critere decisif est la portee. `EAGER` se declare sur le mapping : il
+s'applique a toutes les requetes qui hydratent un `User`, y compris celles qui
+n'ont aucun besoin de la collection de medias. L'effet de bord a ete mesure sur
+`/portfolio`, page qui ne lit jamais `user.medias` :
+
+| `/portfolio` | Sans EAGER | Avec EAGER |
+|---|---:|---:|
+| Requetes SQL | 3 | 4 |
+| Temps SQL | 9,8 ms | 12,3 ms |
+| HTTP median | 59 ms | 72 ms |
+
+Soit environ 22 % de temps de reponse supplementaire sur une page etrangere au
+probleme, et la meme penalite partout ailleurs ou un `User` est charge.
+
+`addSelect` reste au contraire limite a la requete concernee. Il porte aussi son
+intention dans le nom de la methode appelante, la ou un attribut de mapping
+n'explique pas pourquoi il a ete pose : une suppression lors d'un nettoyage
+ferait silencieusement reapparaitre le N+1.
+
+Regle retenue : une optimisation doit avoir la meme portee que le probleme
+qu'elle resout.
+
 ## Complement Lighthouse
 
 Un audit Lighthouse local precedemment releve donne les scores suivants :
