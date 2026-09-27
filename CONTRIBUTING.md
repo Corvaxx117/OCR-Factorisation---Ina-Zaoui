@@ -1,14 +1,10 @@
-# Guide de Contribution
+# Guide de contribution
 
-Merci de vouloir contribuer au projet Ina Zaoui ! Ce document explique comment procéder.
+Merci de votre intérêt pour le projet Ina Zaoui. Ce document décrit **comment contribuer** :
+workflow Git, conventions de commit, standards de code et exigences de qualité.
 
-## Prérequis
-
-- Symfony 8.1+ (version stable du projet ; la LTS actuelle est Symfony 7.4)
-- PHP 8.4+
-- PostgreSQL 16
-- Docker Desktop
-- Git
+L'installation, la stack technique, l'architecture et les commandes d'exploitation
+sont documentées dans le [README](README.md).
 
 ## Workflow Git
 
@@ -21,258 +17,98 @@ git checkout -b feature/ma-feature
 ```
 
 Nommage des branches :
-- `feature/description` — nouvelle fonctionnalité
-- `fix/description` — correction de bug
-- `chore/description` — maintenance, dépendances
-- `docs/description` — documentation
+
+| Préfixe | Usage |
+|---|---|
+| `feature/` | nouvelle fonctionnalité |
+| `fix/` | correction de bug |
+| `chore/` | maintenance, dépendances |
+| `docs/` | documentation |
 
 ### 2. Committer avec Conventional Commits
 
-Format : `type(scope): message`
+Format : `type(scope): message`, à l'impératif et en anglais.
 
 ```bash
 git commit -m "feat(guest): add block/unblock toggle for inactive accounts"
 git commit -m "fix(media): resolve N+1 query on index page"
-git commit -m "docs(readme): update installation instructions"
-git commit -m "refactor(auth): rename UserChecker for clarity"
 ```
 
-**Types autorisés** :
-- `feat` — nouvelle fonctionnalité
-- `fix` — correction de bug
-- `docs` — documentation
-- `refactor` — restructuration de code (pas de logique changée)
-- `test` — ajout de tests
-- `chore` — maintenance, dépendances, config
-- `style` — formatage, indentation (pas de logique changée)
-- `perf` — amélioration de performance
+Types autorisés : `feat`, `fix`, `docs`, `refactor`, `test`, `chore`, `style`, `perf`.
 
-### 3. Pousser et créer une Pull Request
+### 3. Ouvrir une Pull Request
 
 ```bash
 git push origin feature/ma-feature
 ```
 
-Puis créer une PR sur GitHub :
-- Titre descriptif (reprendre le commit message)
-- Description détaillée des changements
-- Lier les issues si applicable (#123)
-- Demander une review
+La PR cible `develop` et doit contenir un titre descriptif, un résumé des changements et
+le lien vers l'issue concernée le cas échéant. Elle n'est fusionnée qu'une fois la pipeline
+GitHub Actions verte et la review validée.
 
-## Architecture
+## Qualité
 
-### Ajouter une nouvelle fonctionnalité
+Toute contribution doit satisfaire les quatre exigences suivantes avant d'être soumise.
 
-**Exemple : ajouter une page "Mentions légales"**
+- La suite **PHPUnit** passe intégralement, sans erreur, avertissement ni *notice* PHP.
+- La **couverture de lignes** reste supérieure à 70 %, entités Doctrine exclues
+  (89,43 % à ce jour). Les entités sont écartées du calcul : leurs accesseurs
+  n'apportent aucune information sur la robustesse du code.
+- **PHPStan** est configuré au **niveau 8** dans `phpstan.dist.neon` et ne remonte aucune
+  erreur. Ce niveau ne doit pas être abaissé pour faire passer une contribution.
+- **PHP CS Fixer** ne signale aucun écart de style.
 
-1. **Créer le controller**
-   ```php
-   // src/Controller/Front/LegalAction.php
-   #[Route(path: '/legal', name: 'legal')]
-   public function __invoke(): Response {
-       return $this->render('front/legal.html.twig');
-   }
-   ```
+### Commandes à lancer avant de pousser
 
-2. **Créer le template**
-   ```twig
-   {# templates/front/legal.html.twig #}
-   {% extends 'front.html.twig' %}
-   
-   {% block front %}
-       <h1>Mentions Légales</h1>
-       <!-- contenu -->
-   {% endblock %}
-   ```
-
-3. **Ajouter le lien de navigation**
-   ```twig
-   {# templates/front.html.twig #}
-   <li class="nav-item">
-       <a class="nav-link" href="{{ path('legal') }}">Mentions</a>
-   </li>
-   ```
-
-4. **Committer**
-   ```bash
-   git add .
-   git commit -m "feat(front): add legal page"
-   git push origin feature/legal-page
-   ```
-
-### Ajouter une entité
-
-**Exemple : ajouter un champ "website" sur User**
-
-1. **Modifier l'entité**
-   ```php
-   // src/Entity/User.php
-   #[ORM\Column(length: 255, nullable: true)]
-   #[Assert\Url(message: 'Veuillez entrer une URL valide.')]
-   private ?string $website = null;
-   
-   public function getWebsite(): ?string {
-       return $this->website;
-   }
-   
-   public function setWebsite(?string $website): void {
-       $this->website = $website;
-   }
-   ```
-
-2. **Générer la migration**
-   ```bash
-   symfony console make:migration
-   symfony console doctrine:migrations:migrate
-   ```
-
-3. **Mettre à jour le formulaire**
-   ```php
-   // src/Form/GuestType.php
-   ->add('website', UrlType::class, ['required' => false])
-   ```
-
-4. **Committer**
-   ```bash
-   git add src/Entity/User.php src/Form/GuestType.php migrations/
-   git commit -m "feat(user): add website field"
-   ```
-
-## Tests & Validation
-
-Avant de pousser :
+Les commandes ci-dessous utilisent le binaire `symfony` et fonctionnent aussi sans lui :
+la table d'équivalence figure dans le [README](README.md#avec-ou-sans-le-binaire-symfony).
 
 ```bash
-# Valider Twig
-symfony console lint:twig templates/
-
-# Valider YAML
-symfony console lint:yaml config/
-
-# Valider le schéma BDD
-symfony console doctrine:schema:validate --env=test
-
-# Vider le cache
-symfony console cache:clear
-
-# Lancer les tests
+# Repartir d'une base de test connue
 symfony console --env=test doctrine:fixtures:load --no-interaction
+
+# Suite de tests
 symfony php bin/phpunit --testdox
+
+# Couverture (rapport HTML dans var/coverage)
 symfony php bin/phpunit --coverage-html var/coverage
 
 # Analyse statique et style
-symfony composer phpstan
-symfony composer cs:check
-symfony composer cs:fix
-symfony composer quality
+symfony composer quality     # PHPStan niveau 8 + vérification du style
+symfony composer cs:fix      # correction automatique du style
+
+# Validation des fichiers de configuration
+symfony console lint:twig templates/
+symfony console lint:yaml config/
+symfony console doctrine:schema:validate --env=test
 ```
 
 ## Standards de code
 
-### Conventions PHP
+### PHP
 
-- Indentation : 4 espaces
-- Noms de classes : PascalCase (`UserChecker`, `MediaUploadAction`)
-- Noms de méthodes : camelCase (`getUserIdentifier()`)
-- Noms de constantes : UPPER_CASE (`MAX_UPLOAD_SIZE`)
-- Ligne max : 120 caractères (soft limit)
+- Indentation de 4 espaces.
+- Classes en `PascalCase`, méthodes et variables en `camelCase`, constantes en `UPPER_SNAKE_CASE`.
+- Longueur de ligne : 120 caractères visés au maximum. Il s'agit d'un repère de lisibilité,
+  pas d'une règle bloquante — une ligne plus longue vaut mieux qu'une coupure artificielle.
+- Le formatage n'est pas à la main : `composer cs:fix` applique le style attendu.
 
-```php
-// ✅ BON
-public function checkPreAuth(UserInterface $user): void
-{
-    if (!$user instanceof User) {
-        return;
-    }
-    
-    if (!$user->isActive()) {
-        throw new CustomUserMessageAccountStatusException(
-            'Votre compte a été désactivé.'
-        );
-    }
-}
-```
-
-### Conventions Twig
-
-- Indentation : 4 espaces
-- Commentaires : `{# commentaire #}`
-- Variables : camelCase (`{{ user.firstName }}`)
-- Filtres : underscore (`{{ text|upper }}`)
-
-```twig
-{# ✅ BON #}
-{% for guest in guests %}
-    <article class="guest-card">
-        <h3>{{ guest.name }}</h3>
-        <p>{{ guest.description|truncate(100) }}</p>
-    </article>
-{% endfor %}
-```
 
 ## Sécurité
 
-Avant de soumettre une PR :
+À vérifier avant de soumettre une contribution :
 
-- ✅ Pas de secrets en clair (tokens, mdp)
-- ✅ Valider les inputs utilisateur
-- ✅ Protéger les POST avec CSRF
-- ✅ Vérifier `#[IsGranted(...)]` sur actions sensibles
-- ✅ Hacher les mots de passe avec `UserPasswordHasherInterface`
-- ✅ Désinfecter les fichiers uploadés
-
-## Performance
-
-- Optimiser les requêtes : utiliser `LEFT JOIN` au lieu de lazy loading
-- Éviter le N+1 : pré-charger les relations avec `->addSelect('...')`
-- Paginer les grandes listes avec `PaginatedResult` (20 éléments par page)
-- Compresser les images (max 2MB)
-
-## Intégration continue
-
-Chaque push et Pull Request vers `develop` ou `main` déclenche GitHub Actions.
-La pipeline prépare PostgreSQL, applique migrations et fixtures, puis exécute
-PHPUnit, PHPStan et PHP CS Fixer. Une contribution ne doit être fusionnée que
-lorsque tous ces contrôles sont verts.
+- aucun secret en clair dans le code ou les fixtures (mots de passe, jetons, clés d'API) ;
+- toute entrée utilisateur validée côté serveur ;
+- toute requête de modification protégée par un jeton CSRF ;
+- tout accès à une ressource sensible soumis à un contrôle d'autorisation explicite ;
+- mots de passe stockés hachés, jamais en clair ni réversibles ;
+- fichiers téléversés contrôlés en type MIME et en taille, et renommés au stockage.
 
 ## Documentation
 
-Toute nouvelle fonctionnalité doit inclure :
+Si le comportement ou l'installation changent lors d'une contribution, mettre à jour la documentation (README) qu'elle rend obsolète.
 
-- Docblocks PHP (classes et méthodes)
-- Commentaires sur code complexe
-- Mise à jour du README si nécessaire
-- Exemple d'utilisation si applicable
+## Besoin d'aide
 
-```php
-/**
- * Vérifie l'état du compte utilisateur avant authentification.
- * Bloque la connexion si le compte est désactivé (active = false).
- */
-class UserChecker implements UserCheckerInterface {
-    // ...
-}
-```
-
-## Release Notes
-
-Quand tu pousses sur `develop`, le code sera listé dans les prochaines notes de version sous la forme :
-
-```markdown
-### Features
-- feat(guest): add block/unblock toggle
-
-### Bug Fixes
-- fix(media): resolve N+1 query
-
-### Documentation
-- docs(readme): update installation
-```
-
-## Besoin d'aide ?
-
-- Consulte le [README.md](README.md)
-- Ouvre une issue si tu as une question
-- Demande une review sur ta PR
-
-Merci pour ta contribution ! 🙏
+Consultez le [README](README.md) ou ouvrez une issue sur le dépôt.

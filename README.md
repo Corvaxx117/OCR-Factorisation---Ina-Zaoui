@@ -16,7 +16,7 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
 - **Gestion invités** — Ajouter, bloquer/débloquer, supprimer les photographes invités
 - **Contrôle d'accès** — Pagination, sécurité CSRF et authentification par formulaire Symfony
 
-## 🛠 Stack Technique
+## Stack technique
 
 | Technologie | Version |
 |------------|---------|
@@ -81,7 +81,20 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
    symfony server:start
    ```
 
-   Accéder à : **https://127.0.0.1:8001**
+   Accéder à : **https://127.0.0.1:8000**
+
+### Avec ou sans le binaire Symfony
+
+Toutes les commandes de ce README utilisent le binaire `symfony`, qui sélectionne
+automatiquement la version de PHP fixée par le fichier `.php-version`. Elles fonctionnent
+aussi sans lui, à condition que le PHP du système soit en 8.4.
+
+| Avec le binaire Symfony | Sans le binaire |
+|---|---|
+| `symfony composer <commande>` | `composer <commande>` |
+| `symfony php <fichier>` | `php <fichier>` |
+| `symfony console <commande>` | `php bin/console <commande>` |
+| `symfony server:start` | `php -S 127.0.0.1:8000 -t public/` |
 
 ## Identifiants de test
 
@@ -98,6 +111,24 @@ Portfolio photographique moderne pour Ina Zaoui, présentant ses œuvres et cell
 - **Accès** : Voir/gérer seulement ses propres médias
 
 ## Architecture
+
+### Single Action Controllers
+
+Chaque contrôleur est une classe dédiée à une seule route et expose une unique méthode
+`__invoke()`. Le nom de la classe décrit l'action (`PortfolioAction`, `MediaDeleteAction`)
+et les dépendances sont injectées dans la signature de l'action plutôt que dans un
+constructeur partagé entre plusieurs routes.
+
+```php
+// src/Controller/Front/PortfolioAction.php
+#[Route(path: '/portfolio/{id?}', name: 'portfolio')]
+public function __invoke(AlbumRepository $albums, MediaRepository $medias, ?int $id = null): Response
+```
+
+Ce découpage remplace les contrôleurs fourre-tout de la version initiale. Chaque classe
+n'a plus qu'une seule raison de changer, les dépendances déclarées sont exactement celles
+que l'action utilise, et une route se lit sans avoir à identifier quelle méthode lui
+correspond.
 
 ### Répertoires clés
 ```
@@ -129,108 +160,36 @@ templates/
 └── _flashes.html.twig # Affichage messages (success/error)
 ```
 
-### Entités
-- **User** — Représente admin et invités
-  - Champs : `id`, `email`, `password`, `name`, `admin`, `active`, `roles`, `medias`
-   - Sécurité : mot de passe haché par le hasher Symfony, `active` bloque la connexion
-  
-- **Album** — Groupement de médias
-  - Relation : `OneToMany → Media`
-  - Validation : nom requis, max 255 caractères
-  
-- **Media** — Images uploadées
-  - Champs : `path`, `title`, `user_id`, `album_id`
-  - Validation : MIME JPEG/PNG/GIF/WebP, taille ≤ 2MB
-   - Suppression : fichier physique géré par `FileUploadService` lors de la suppression d'un média ou d'un invité
-
 ## Performance
 
-| Page | Requêtes BD | Temps SQL | Optimisation |
-|------|-----------|----------|-------------|
-| `/guests` | 2 | 25ms | `LEFT JOIN` (avant : 102 req / 181ms) |
-| `/admin/media` | Pagérisé | Dépend filtre | Filtrage utilisateur inclus |
-| `/portfolio` | 1-2 | Rapide | Album optionnel |
-
-**Audit Lighthouse** (dev)
-- Performance : 95
-- Accessibilité : 96
-- Bonnes pratiques : 96
-- SEO : 54 (noindex en dev, sera 90+ en prod)
 
 Les mesures detaillees et la comparaison avant/apres de la page Invites sont
 disponibles dans [docs/RAPPORT_PERFORMANCE.md](docs/RAPPORT_PERFORMANCE.md).
 
 ## Sécurité
 
- **Implémentée**
--  Hashage de mots de passe géré par Symfony
--  Protection CSRF sur tous les POST
--  Contrôle d'accès `#[IsGranted('ROLE_*')]`
--  Validation fichiers uploadés (MIME + taille)
--  `UserChecker` — bloque les comptes inactifs
--  Suppression en cascade des médias orphelins
+- Hachage des mots de passe géré par Symfony
+- Protection CSRF sur tous les POST
+- Contrôle d'accès `#[IsGranted('ROLE_*')]`
+- Validation des fichiers uploadés (MIME + taille)
+- `UserChecker` — bloque les comptes inactifs
+- Suppression en cascade des médias orphelins
 
-## Commandes utiles
 
-```bash
-# Développement
-symfony server:start                          # Lancer le serveur dev
-symfony console cache:clear                   # Vider le cache
-symfony console doctrine:migrations:status    # Vérifier migrations
 
-# BDD
-symfony console doctrine:database:create      # Créer la BDD
-symfony console doctrine:database:drop --force # Supprimer la BDD
-symfony console doctrine:migrations:migrate   # Appliquer les migrations
-
-# Tests
-symfony console lint:twig templates/         # Valider Twig
-symfony console lint:yaml config/            # Valider YAML
-symfony console doctrine:schema:validate --env=test # Valider le schéma de test
-symfony php bin/phpunit --testdox             # Lancer les tests
-symfony php bin/phpunit --coverage-html var/coverage # Générer le rapport de couverture
-symfony console --env=test doctrine:fixtures:load --no-interaction # Recharger les données de test
-symfony composer phpstan                      # Analyser le code statiquement
-symfony composer cs:check                     # Vérifier le style sans modifier les fichiers
-symfony composer cs:fix                       # Corriger automatiquement le style
-symfony composer quality                      # Exécuter PHPStan et le contrôle de style
-
-# Git
-git checkout develop
-git pull origin develop
-git checkout -b feature/my-feature
-git add .
-git commit -m "feat: description"
-git push origin feature/my-feature
-```
-
-## Git Workflow
-
-- **Branche `main`** — Code de production stable
-- **Branche `develop`** — Intégration continue des features
-- **Branches `feature/*`** — Nouvelles fonctionnalités
-- **Branches `fix/*`** — Corrections de bugs
-- **Convention commits** : `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`
-
-Exemple :
-```bash
-git checkout -b feature/guest-management
-# ... travail ...
-git commit -m "feat: add guest CRUD with active/inactive toggle"
-git push origin feature/guest-management
-# → Créer une Pull Request sur GitHub
-```
+Les commandes de tests, de couverture et d'analyse statique sont décrites dans le
+[guide de contribution](CONTRIBUTING.md).
 
 ## Points clés du projet
 
 ### Corrections effectuées
--  Migration Symfony 5.4 → 8.1 (avec corrections de breaking changes)
--  PHP 8.2 → PHP 8.4 (PHP 8.4 native)
--  Single Action Controllers (découpage des controllers)
--  Injection de dépendances (plus de `getDoctrine()`)
--  Attributs PHP 8 (`#[Route]`, `#[ORM\*]`)
--  Validation complète des entités
--  Tests de sécurité (CSRF, authentification, autorisation)
+- Migration Symfony 5.4 → 8.1 (avec corrections de breaking changes)
+- PHP 8.2 → PHP 8.4
+- Single Action Controllers (découpage des contrôleurs)
+- Injection de dépendances (plus de `getDoctrine()`)
+- Attributs PHP 8 (`#[Route]`, `#[ORM\*]`)
+- Validation complète des entités
+- Tests de sécurité (CSRF, authentification, autorisation)
 
 ### N+1 queries résolu
 - **Avant** : 102 requêtes / 181ms sur `/guests`
@@ -252,10 +211,8 @@ exécuté manuellement depuis l'onglet Actions.
 
 ## Contribution
 
-1. Fork le projet
-2. Créer une branche `feature/ma-feature`
-3. Committer avec messages explicites
-4. Pousser et créer une PR
+Le workflow Git, les conventions de commit, les standards de code et les exigences de
+qualité sont décrits dans le [guide de contribution](CONTRIBUTING.md).
 
 ## Licence
 
