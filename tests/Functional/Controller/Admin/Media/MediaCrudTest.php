@@ -195,6 +195,34 @@ class MediaCrudTest extends WebTestCase
         $this->assertNull($this->em->getRepository(Media::class)->find($media->getId()));
     }
 
+    public function testDeletingMediaAlsoRemovesTheFileFromDisk(): void
+    {
+        $this->loginAs(admin: false);
+
+        $crawler = $this->client->request('GET', '/admin/media/add');
+        $form = $crawler->filter('form')->form([
+            'media[title]' => 'Photo effacee du disque',
+        ]);
+        /** @var FileFormField $fileField */
+        $fileField = $form['media[file]'];
+        $fileField->upload($this->createTestPngFile());
+        $this->client->submit($form);
+
+        $this->em->clear();
+        $media = $this->em->getRepository(Media::class)->findOneBy(['title' => 'Photo effacee du disque']);
+        $this->assertNotNull($media);
+        $this->uploadedFiles[] = $media->getPath();
+        $absolutePath = $this->getPublicUploadPath($media->getPath());
+        $this->assertFileExists($absolutePath);
+
+        $crawler = $this->client->request('GET', '/admin/media');
+        $token = $crawler->filter('form[action$="/admin/media/delete/'.$media->getId().'"] input[name="_token"]')->attr('value');
+        $this->client->request('POST', '/admin/media/delete/'.$media->getId(), ['_token' => $token]);
+
+        $this->assertResponseRedirects('/admin/media');
+        $this->assertFileDoesNotExist($absolutePath);
+    }
+
     public function testNonOwnerNonAdminCannotDeleteSomeoneElsesMedia(): void
     {
         $this->loginAs(admin: false);
