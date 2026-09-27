@@ -3,8 +3,8 @@
 ## Etat actuel
 
 La suite repose sur PHPUnit 11, PostgreSQL 16, PCOV pour la couverture et
-`dama/doctrine-test-bundle` pour l'isolation transactionnelle. Elle contient 58
-tests et 203 assertions, avec 93,26 % de lignes couvertes, au-dessus de
+`dama/doctrine-test-bundle` pour l'isolation transactionnelle. Elle contient 61
+tests et 212 assertions, avec 95,51 % de lignes couvertes, au-dessus de
 l'objectif de 70 %.
 
 ## Organisation

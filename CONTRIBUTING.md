@@ -52,7 +52,7 @@ Toute contribution doit satisfaire les quatre exigences suivantes avant d'être 
 
 - La suite **PHPUnit** passe intégralement, sans erreur, avertissement ni *notice* PHP.
 - La **couverture de lignes** reste supérieure à 70 %, entités Doctrine exclues
-  (95,45 % à ce jour). Les entités sont écartées du calcul : leurs accesseurs
+  (98,18 % à ce jour). Les entités sont écartées du calcul : leurs accesseurs
   n'apportent aucune information sur la robustesse du code.
 - **PHPStan** est configuré au **niveau 8** dans `phpstan.dist.neon` et ne remonte aucune
   erreur. Ce niveau ne doit pas être abaissé pour faire passer une contribution.
