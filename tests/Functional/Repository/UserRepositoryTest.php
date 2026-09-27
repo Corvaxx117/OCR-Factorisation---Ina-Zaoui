@@ -8,6 +8,8 @@ use App\Repository\UserRepository;
 use App\Tests\Support\DoctrineTestTrait;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 /**
  * KernelTestCase démarre le kernel Symfony (conteneur, config, connexion BDD) sans lancer de serveur HTTP.
@@ -71,6 +73,32 @@ class UserRepositoryTest extends KernelTestCase
         $this->assertNotFalse($reloadedGuest);
         // Le LEFT JOIN + addSelect('m') doit avoir chargé les médias en même temps que l'utilisateur (pas de requête supplémentaire).
         $this->assertCount(1, $reloadedGuest->getMedias());
+    }
+
+    public function testUpgradePasswordPersistsTheNewHash(): void
+    {
+        $user = $this->createUser('rehash@test.local', admin: false, active: true);
+
+        $this->userRepository->upgradePassword($user, 'nouveau-hash');
+        $this->em->clear(); // force une relecture depuis la BDD plutôt que depuis l'identity map
+
+        $reloadedUser = $this->userRepository->findOneBy(['email' => 'rehash@test.local']);
+        $this->assertInstanceOf(User::class, $reloadedUser);
+        $this->assertSame('nouveau-hash', $reloadedUser->getPassword());
+    }
+
+    public function testUpgradePasswordRejectsAnUnsupportedUser(): void
+    {
+        $foreignUser = new class implements PasswordAuthenticatedUserInterface {
+            public function getPassword(): string
+            {
+                return 'hash';
+            }
+        };
+
+        $this->expectException(UnsupportedUserException::class);
+
+        $this->userRepository->upgradePassword($foreignUser, 'nouveau-hash');
     }
 
     private function createUser(string $email, bool $admin, bool $active): User
