@@ -4,7 +4,6 @@ namespace App\Form;
 
 use App\Entity\Album;
 use App\Entity\Media;
-use App\Entity\User;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -15,7 +14,7 @@ use Symfony\Component\Validator\Constraints\File;
 
 /**
  * Formulaire d'ajout d'un média.
- * Affiche les champs user/album uniquement pour les admins.
+ * Le champ album n'est proposé qu'aux admins ; l'auteur est toujours l'utilisateur connecté.
  */
 /** @extends AbstractType<Media> */
 class MediaType extends AbstractType
@@ -39,12 +38,6 @@ class MediaType extends AbstractType
 
         if ($options['is_admin']) {
             $builder
-                ->add('user', EntityType::class, [
-                    'label' => 'Utilisateur',
-                    'required' => false,
-                    'class' => User::class,
-                    'choice_label' => 'name',
-                ])
                 ->add('album', EntityType::class, [
                     'label' => 'Album',
                     'required' => false,

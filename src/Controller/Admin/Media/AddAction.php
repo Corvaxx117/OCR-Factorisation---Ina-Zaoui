@@ -34,9 +34,7 @@ class AddAction extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if (!$this->isGranted('ROLE_ADMIN')) {
-                $media->setUser($currentUser);
-            }
+            $media->setUser($currentUser);
             $file = $media->getFile();
             if (null === $file) {
                 throw new \LogicException('Un fichier valide est requis.');
