@@ -65,7 +65,7 @@ jobs:
           php bin/console doctrine:fixtures:load --env=test --no-interaction
 
       - name: Run test suite
-        run: php bin/phpunit --testdox --coverage-html var/coverage --coverage-clover var/coverage.xml
+        run: php bin/phpunit --testdox --coverage-html TestCoverage --coverage-clover var/coverage.xml
 
       - name: Upload coverage report
         if: always()
@@ -73,7 +73,7 @@ jobs:
         with:
           name: coverage-report
           path: |
-            var/coverage/
+            TestCoverage/
             var/coverage.xml
           if-no-files-found: warn
 
