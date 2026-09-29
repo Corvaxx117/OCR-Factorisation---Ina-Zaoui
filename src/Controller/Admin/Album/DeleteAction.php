@@ -4,6 +4,7 @@ namespace App\Controller\Admin\Album;
 
 use App\Controller\Admin\AdminActionTrait;
 use App\Entity\Album;
+use App\Service\FileUploadService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,7 +15,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Suppression d'un album (POST + CSRF, admin uniquement).
- * Les médias associés sont supprimés en cascade.
+ * Les médias associés sont supprimés en cascade, fichiers sur disque compris.
  */
 #[IsGranted('ROLE_ADMIN')]
 class DeleteAction extends AbstractController
@@ -26,8 +27,14 @@ class DeleteAction extends AbstractController
         Request $request,
         #[MapEntity(id: 'id')] Album $album,
         EntityManagerInterface $em,
+        FileUploadService $fileUploadService,
     ): Response {
         $this->denyAccessUnlessValidCsrfToken('delete-album-'.$album->getId(), $request);
+
+        // La cascade Doctrine retire les lignes en base mais laisserait les fichiers sur le disque.
+        foreach ($album->getMedias() as $media) {
+            $fileUploadService->remove($media->getPath());
+        }
 
         $em->remove($album);
         $em->flush();
